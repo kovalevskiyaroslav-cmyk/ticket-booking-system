@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -44,14 +45,14 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    @GetMapping("/by-date")
-    public ResponseEntity<List<TicketResponseDto>> getTicketsByPurchaseDateTimeBetween(
-            @RequestParam("after") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeAfter,
-            @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeBefore) {
+    @GetMapping("/by-price")
+    public ResponseEntity<List<TicketResponseDto>> getTicketsByPriceBetween(
+            @RequestParam("lower") BigDecimal lowerPrice,
+            @RequestParam("higher") BigDecimal higherPrice) {
 
-        final List<TicketResponseDto> tickets = ticketService.getTicketsByPurchaseDateTimeBetween(
-                dateTimeBefore,
-                dateTimeAfter);
+        final List<TicketResponseDto> tickets = ticketService.getTicketsByPriceBetween(
+                lowerPrice,
+                higherPrice);
 
         return ResponseEntity.ok(tickets);
     }

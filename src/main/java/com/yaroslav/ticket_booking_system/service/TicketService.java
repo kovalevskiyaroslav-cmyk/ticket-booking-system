@@ -3,6 +3,7 @@ package com.yaroslav.ticket_booking_system.service;
 import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
 import com.yaroslav.ticket_booking_system.dto.TicketResponseDto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -12,9 +13,9 @@ public interface TicketService {
 
     TicketResponseDto getTicketById(UUID id);
 
-    List<TicketResponseDto> getTicketsByPurchaseDateTimeBetween(
-            LocalDateTime dateTimeBefore,
-            LocalDateTime dateTimeAfter);
+    List<TicketResponseDto> getTicketsByPriceBetween(
+            BigDecimal lowerPrice,
+            BigDecimal higherPrice);
 
     List<TicketResponseDto> getTicketsByEventId(UUID id);
 

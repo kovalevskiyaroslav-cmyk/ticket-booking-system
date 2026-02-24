@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -73,11 +74,11 @@ public class TicketServiceImpl implements TicketService {
     }
     @Override
     @Transactional(readOnly = true)
-    public List<TicketResponseDto> getTicketsByPurchaseDateTimeBetween(
-            LocalDateTime dateTimeBefore,
-            LocalDateTime dateTimeAfter) {
+    public List<TicketResponseDto> getTicketsByPriceBetween(
+            BigDecimal lowerPrice,
+            BigDecimal higherPrice) {
 
-        return ticketRepository.findByPurchaseDateTimeBetween(dateTimeBefore, dateTimeAfter)
+        return ticketRepository.findByPriceBetween(lowerPrice, higherPrice)
                 .stream()
                 .map(ticketMapper::toDto)
                 .toList();
