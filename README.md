@@ -2,7 +2,10 @@
 
 ## Project Description
 
-A REST-based ticket booking system for managing events and seat reservations.
+The Ticket Booking System is a REST-based web application developed using Spring Boot.
+It provides a comprehensive backend solution for managing events, venues, seat reservations, ticket purchases, orders, and payments.
+
+The system is designed using a layered architecture (Controller → Service → Repository) and follows REST principles for API design. It ensures clean separation of concerns, maintainable code structure, and scalability.
 
 ## Core Functionality
 
