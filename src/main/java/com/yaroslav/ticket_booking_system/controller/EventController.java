@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,12 +54,27 @@ public class EventController {
 
     @GetMapping("/by-date")
     public ResponseEntity<List<EventResponseDto>> getEventsByDateTimeBetween(
-            @RequestParam("after") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeAfter,
-            @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeBefore) {
+            @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeBefore,
+            @RequestParam("after") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeAfter) {
 
         final List<EventResponseDto> events = eventService.getEventsByDateTimeBetween(dateTimeBefore, dateTimeAfter);
 
         return ResponseEntity.ok(events);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<EventResponseDto> updateEventById(@PathVariable UUID id, @RequestBody EventRequestDto requestDto) {
+
+        final EventResponseDto event = eventService.updateById(id, requestDto);
+
+        return ResponseEntity.ok(event);
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> deleteEventById(@PathVariable UUID id) {
+
+        eventService.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
