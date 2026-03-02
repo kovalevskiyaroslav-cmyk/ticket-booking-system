@@ -21,6 +21,5 @@ public class TicketRequestDto {
     @NotNull
     private UUID eventId;
 
-    @NotNull
     private UUID orderId;
 }

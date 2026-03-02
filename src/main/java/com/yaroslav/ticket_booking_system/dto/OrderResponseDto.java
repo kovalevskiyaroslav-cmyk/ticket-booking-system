@@ -21,5 +21,6 @@ public class OrderResponseDto {
     private OrderStatus status;
     private BigDecimal totalPrice;
     private UUID userId;
+    private PaymentResponseDto paymentDto;
     private List<UUID> ticketIds;
 }
