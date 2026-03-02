@@ -1,5 +1,6 @@
 package com.yaroslav.ticket_booking_system.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,6 +41,18 @@ public class Payment extends AbstractAuditableEntity {
     @Column(nullable = false)
     private Instant timestamp;
 
-    @OneToOne(mappedBy = "payment")
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Order order;
+
+    public void refund() {
+        status = PaymentStatus.REFUNDED;
+    }
+
+    public void complete() {
+        status = PaymentStatus.COMPLETED;
+    }
+
+    public void fail() {
+        status = PaymentStatus.FAILED;
+    }
 }

@@ -1,5 +1,6 @@
 package com.yaroslav.ticket_booking_system.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -39,7 +40,7 @@ public class Ticket extends AbstractAuditableEntity {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "ticket")
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Seat> seats;
 
     @ManyToOne(fetch = FetchType.LAZY)

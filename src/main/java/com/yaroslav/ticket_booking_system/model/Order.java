@@ -54,12 +54,25 @@ public class Order extends AbstractAuditableEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets = new ArrayList<>();
+
+    public Order(User user) {
+        this.user = user;
+        this.dateTime = LocalDateTime.now();
+        this.deleted = false;
+        this.status = OrderStatus.CREATED;
+        this.totalPrice = BigDecimal.ZERO;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+        payment.setOrder(this);
+    }
 
     public void addTicket(Ticket ticket) {
         if (!tickets.contains(ticket)) {
@@ -73,5 +86,38 @@ public class Order extends AbstractAuditableEntity {
         tickets.remove(ticket);
         ticket.setOrder(null);
         totalPrice = totalPrice.subtract(ticket.getPrice());
+    }
+
+    public void pay() {
+        if (status.canTransitionTo(OrderStatus.PAID)) {
+            throw new IllegalStateException("Cannot mark order as PAID from " + status);
+        }
+
+        status = OrderStatus.PAID;
+        payment.complete();
+    }
+
+    public void cancel() {
+        if (status.canTransitionTo(OrderStatus.CANCELLED)) {
+            throw new IllegalStateException("Cannot mark order as CANCELLED from " + status);
+        }
+
+        if (status == OrderStatus.PAID) {
+            payment.refund();
+        } else if (status == OrderStatus.CREATED) {
+            payment.fail();
+        }
+
+        status = OrderStatus.CANCELLED;
+        payment.fail();
+    }
+
+    public void refund() {
+        if (status.canTransitionTo(OrderStatus.REFUNDED)) {
+            throw new IllegalStateException("Cannot mark order as CANCELLED from " + status);
+        }
+
+        status = OrderStatus.REFUNDED;
+        payment.refund();
     }
 }
