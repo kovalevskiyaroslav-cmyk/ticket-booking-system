@@ -19,5 +19,4 @@ public class PaymentResponseDto {
     private PaymentStatus status;
     private BigDecimal paymentAmount;
     private Instant timestamp;
-    private UUID orderId;
 }
