@@ -67,7 +67,7 @@ CREATE TABLE orders(
 CREATE TABLE tickets(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     event_id UUID NOT NULL,
-    order_id UUID NOT NULL,
+    order_id UUID,
     purchase_date_time TIMESTAMP,
     price NUMERIC(19, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
