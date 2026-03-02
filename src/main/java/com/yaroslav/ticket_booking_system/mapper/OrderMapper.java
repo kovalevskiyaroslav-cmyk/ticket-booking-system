@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {PaymentMapper.class})
 public interface OrderMapper {
 
     @Mapping(target = "user", ignore = true)
@@ -19,10 +19,12 @@ public interface OrderMapper {
     @Mapping(target = "totalPrice", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "tickets", ignore = true)
+    @Mapping(target = "payment", ignore = true)
     Order toEntity(OrderRequestDto requestDto);
 
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "tickets", target = "ticketIds")
+    @Mapping(source = "payment", target = "paymentDto")
     OrderResponseDto toDto(Order order);
 
     default List<UUID> mapTickets(List<Ticket> tickets) {

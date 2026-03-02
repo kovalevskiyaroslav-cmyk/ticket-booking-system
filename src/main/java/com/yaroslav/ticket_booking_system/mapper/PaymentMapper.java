@@ -9,11 +9,9 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
 
-    @Mapping(target = "order", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "timestamp", ignore = true)
     Payment toEntity(PaymentRequestDto requestDto);
 
-    @Mapping(source = "order.id", target = "orderId")
     PaymentResponseDto toDto(Payment payment);
 }
