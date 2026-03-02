@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto addFavoriteEventToUser(UUID id, UUID eventId) {
 
-        final Event event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException(id));
+        final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(id));
 
         final User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         user.getFavoriteEvents().add(event);
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto removeFavoriteEventFromUser(UUID id, UUID eventId) {
 
-        final Event event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException(id));
+        final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(id));
 
         final User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         user.getFavoriteEvents().remove(event);
@@ -111,24 +111,9 @@ public class UserServiceImpl implements UserService {
         } else if (updateDto.getEmail() != null) {
             user.setEmail(updateDto.getEmail());
         }
-
-        return userMapper.toDto(user);
-    }
-
-    @Override
-    @Transactional
-    public UserResponseDto activateUserById(UUID id) {
-
-        final User user = userRepository.activateUser(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        return userMapper.toDto(user);
-    }
-
-    @Override
-    @Transactional
-    public UserResponseDto deactivateUserById(UUID id) {
-
-        final User user = userRepository.deactivateUser(id).orElseThrow(() -> new UserNotFoundException(id));
+        else {
+            user.setActive(updateDto.getActive());
+        }
 
         return userMapper.toDto(user);
     }

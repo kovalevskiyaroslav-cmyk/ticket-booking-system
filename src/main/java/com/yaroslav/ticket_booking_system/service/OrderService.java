@@ -13,6 +13,10 @@ import java.util.UUID;
 public interface OrderService {
     OrderResponseDto createOrder(OrderRequestDto requestDto);
 
+    OrderResponseDto demonstratePartialSave(OrderRequestDto requestDto);
+
+    OrderResponseDto demonstrateTransaction(OrderRequestDto requestDto);
+
     OrderResponseDto getOrderById(UUID id);
 
     List<OrderResponseDto> getOrdersByStatus(OrderStatus orderStatus);
@@ -28,6 +32,8 @@ public interface OrderService {
     OrderResponseDto removeTicketFromOrder(UUID id, UUID ticketId);
 
     OrderResponseDto softDeleteOrderById(UUID id);
+
+
 
     void deleteOrderById(UUID id);
 }

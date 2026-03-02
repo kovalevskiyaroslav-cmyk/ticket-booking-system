@@ -23,9 +23,5 @@ public interface UserService {
 
     UserResponseDto updateUserById(UUID id, UserUpdateDto updateDto);
 
-    UserResponseDto activateUserById(UUID id);
-
-    UserResponseDto deactivateUserById(UUID id);
-
     void deleteUserById(UUID id);
 }
