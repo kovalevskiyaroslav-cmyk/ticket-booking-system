@@ -37,8 +37,7 @@ public class Order extends AbstractAuditableEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private LocalDateTime dateTime;
+    private LocalDateTime completedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -63,7 +62,6 @@ public class Order extends AbstractAuditableEntity {
 
     public Order(User user) {
         this.user = user;
-        this.dateTime = LocalDateTime.now();
         this.deleted = false;
         this.status = OrderStatus.CREATED;
         this.totalPrice = BigDecimal.ZERO;
@@ -89,7 +87,7 @@ public class Order extends AbstractAuditableEntity {
     }
 
     public void pay() {
-        if (status.canTransitionTo(OrderStatus.PAID)) {
+        if (status.cannotTransitionTo(OrderStatus.PAID)) {
             throw new IllegalStateException("Cannot mark order as PAID from " + status);
         }
 
@@ -98,7 +96,7 @@ public class Order extends AbstractAuditableEntity {
     }
 
     public void cancel() {
-        if (status.canTransitionTo(OrderStatus.CANCELLED)) {
+        if (status.cannotTransitionTo(OrderStatus.CANCELLED)) {
             throw new IllegalStateException("Cannot mark order as CANCELLED from " + status);
         }
 
@@ -113,7 +111,7 @@ public class Order extends AbstractAuditableEntity {
     }
 
     public void refund() {
-        if (status.canTransitionTo(OrderStatus.REFUNDED)) {
+        if (status.cannotTransitionTo(OrderStatus.REFUNDED)) {
             throw new IllegalStateException("Cannot mark order as CANCELLED from " + status);
         }
 

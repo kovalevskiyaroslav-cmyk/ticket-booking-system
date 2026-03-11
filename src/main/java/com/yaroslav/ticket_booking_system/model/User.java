@@ -34,17 +34,14 @@ public class User extends AbstractAuditableEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 20)
     private String phone;
-
-    @Column(nullable = false)
-    private Boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
@@ -60,12 +57,12 @@ public class User extends AbstractAuditableEntity {
     public void addFavoriteEvent(Event event) {
         if (!favoriteEvents.contains(event)) {
             favoriteEvents.add(event);
-            event.getSubscribedUsers().add(this);
+            event.getFavoritedBy().add(this);
         }
     }
 
     public void removeFavoriteEvent(Event event) {
         favoriteEvents.remove(event);
-        event.getSubscribedUsers().remove(this);
+        event.getFavoritedBy().remove(this);
     }
 }

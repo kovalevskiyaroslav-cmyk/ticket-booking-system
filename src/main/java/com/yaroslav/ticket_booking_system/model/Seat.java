@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,9 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "seats")
+@Table(name = "seats", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"venue_id", "section", "number"})
+})
 public class Seat extends AbstractAuditableEntity {
 
     @Id
@@ -30,17 +33,13 @@ public class Seat extends AbstractAuditableEntity {
     private UUID id;
 
     @Column(nullable = false)
-    private Integer seatNum;
+    private Integer number;
 
     @Column(nullable = false)
     private Integer section;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal price;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticket_id")
-    private Ticket ticket;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)
