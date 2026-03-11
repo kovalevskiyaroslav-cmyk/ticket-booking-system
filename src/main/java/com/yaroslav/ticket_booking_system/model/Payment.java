@@ -1,6 +1,5 @@
 package com.yaroslav.ticket_booking_system.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -36,12 +34,9 @@ public class Payment extends AbstractAuditableEntity {
     private PaymentStatus status;
 
     @Column(nullable = false, precision = 19, scale = 2)
-    private BigDecimal paymentAmount;
+    private BigDecimal amount;
 
-    @Column(nullable = false)
-    private Instant timestamp;
-
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "payment")
     private Order order;
 
     public void refund() {
