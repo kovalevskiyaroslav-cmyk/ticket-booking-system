@@ -2,6 +2,7 @@ package com.yaroslav.ticket_booking_system.controller;
 
 import com.yaroslav.ticket_booking_system.dto.EventRequestDto;
 import com.yaroslav.ticket_booking_system.dto.EventResponseDto;
+import com.yaroslav.ticket_booking_system.dto.EventUpdateDto;
 import com.yaroslav.ticket_booking_system.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -54,18 +55,18 @@ public class EventController {
 
     @GetMapping("/by-date")
     public ResponseEntity<List<EventResponseDto>> getEventsByDateTimeBetween(
-            @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeBefore,
-            @RequestParam("after") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeAfter) {
+            @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam("after") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
 
-        final List<EventResponseDto> events = eventService.getEventsByDateTimeBetween(dateTimeBefore, dateTimeAfter);
+        final List<EventResponseDto> events = eventService.getEventsByDateTimeBetween(start, end);
 
         return ResponseEntity.ok(events);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<EventResponseDto> updateEventById(@PathVariable UUID id, @RequestBody EventRequestDto requestDto) {
+    public ResponseEntity<EventResponseDto> updateEventById(@PathVariable UUID id, @RequestBody EventUpdateDto updateDto) {
 
-        final EventResponseDto event = eventService.updateById(id, requestDto);
+        final EventResponseDto event = eventService.updateById(id, updateDto);
 
         return ResponseEntity.ok(event);
     }

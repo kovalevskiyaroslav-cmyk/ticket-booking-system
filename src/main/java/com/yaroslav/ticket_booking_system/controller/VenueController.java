@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -54,14 +53,6 @@ public class VenueController {
     public ResponseEntity<VenueResponseDto> getVenueByAddress(@PathVariable String address) {
 
         final VenueResponseDto venue = venueService.getVenueByAddress(address);
-
-        return ResponseEntity.ok(venue);
-    }
-
-    @GetMapping("/city/{city}")
-    public ResponseEntity<List<VenueResponseDto>> getVenuesByCity(@PathVariable String city) {
-
-        final List<VenueResponseDto> venue = venueService.getVenuesByCity(city);
 
         return ResponseEntity.ok(venue);
     }

@@ -44,28 +44,32 @@ public class SeatController {
         return ResponseEntity.ok(seat);
     }
 
-    @GetMapping("/num/{seatNum}")
-    public ResponseEntity<SeatResponseDto> getSeatBySeatNum(@PathVariable Integer seatNum) {
+    @GetMapping("/num/{number}/venue/{venueId}")
+    public ResponseEntity<SeatResponseDto> getSeatByVenueIdAndNumber(
+            @PathVariable Integer number,
+            @PathVariable UUID venueId) {
 
-        final SeatResponseDto seat = seatService.getSeatBySeatNum(seatNum);
+        final SeatResponseDto seat = seatService.getSeatByVenueIdAndNumber(venueId, number);
 
         return ResponseEntity.ok(seat);
     }
 
-    @GetMapping("/section/{section}")
-    public ResponseEntity<List<SeatResponseDto>> getSeatsBySection(@PathVariable Integer section) {
+    @GetMapping("/section/{section}/venue/{venueId}")
+    public ResponseEntity<List<SeatResponseDto>> getSeatsByVenueIdAndSection(
+            @PathVariable Integer section,
+            @PathVariable UUID venueId) {
 
-        final List<SeatResponseDto> seats = seatService.getSeatsBySection(section);
+        final List<SeatResponseDto> seats = seatService.getSeatsByVenueIdAndSection(venueId, section);
 
         return ResponseEntity.ok(seats);
     }
 
     @GetMapping("/by-price")
     public ResponseEntity<List<SeatResponseDto>> getSeatsByPriceBetween(
-            @RequestParam("lower") BigDecimal lowerPrice,
-            @RequestParam("higher") BigDecimal higherPrice) {
+            @RequestParam("lower") BigDecimal min,
+            @RequestParam("higher") BigDecimal max) {
 
-        final List<SeatResponseDto> seats = seatService.getSeatsByPriceBetween(lowerPrice, higherPrice);
+        final List<SeatResponseDto> seats = seatService.getSeatsByPriceBetween(min, max);
 
         return ResponseEntity.ok(seats);
     }
