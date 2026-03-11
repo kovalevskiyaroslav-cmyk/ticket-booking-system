@@ -3,9 +3,8 @@
 -- changeset Yaroslav:create-venues
 CREATE TABLE venues(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    address VARCHAR(100) NOT NULL,
-    city VARCHAR(50) NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    address VARCHAR(300) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -15,9 +14,8 @@ CREATE TABLE venues(
 CREATE TABLE users(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    active BOOLEAN NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -27,8 +25,7 @@ CREATE TABLE users(
 CREATE TABLE payments(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     status VARCHAR(20) NOT NULL,
-    payment_amount NUMERIC(19, 2) NOT NULL,
-    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+    amount NUMERIC(19, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -38,21 +35,20 @@ CREATE TABLE payments(
 CREATE TABLE events(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     venue_id UUID NOT NULL,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(200) NOT NULL,
     description TEXT,
     date_time TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_events_venues FOREIGN KEY (venue_id) REFERENCES venues(id)
 );
--- rollback DROP TABLE events;
 
 -- changeset Yaroslav:create-orders
 CREATE TABLE orders(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     payment_id UUID,
-    date_time TIMESTAMP NOT NULL,
+    completed_at TIMESTAMP,
     status VARCHAR(20) NOT NULL,
     total_price NUMERIC(19, 2) NOT NULL,
     deleted BOOLEAN NOT NULL,
@@ -63,34 +59,35 @@ CREATE TABLE orders(
 );
 -- rollback DROP TABLE orders;
 
--- changeset Yaroslav:create-tickets
-CREATE TABLE tickets(
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    event_id UUID NOT NULL,
-    order_id UUID,
-    purchase_date_time TIMESTAMP,
-    price NUMERIC(19, 2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_tickets_events FOREIGN KEY (event_id) REFERENCES events(id),
-    CONSTRAINT fk_tickets_orders FOREIGN KEY (order_id) REFERENCES orders(id)
-);
--- rollback DROP TABLE tickets;
-
 -- changeset Yaroslav:create-seats
 CREATE TABLE seats(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ticket_id UUID,
     venue_id UUID NOT NULL,
-    seat_num INT NOT NULL,
+    number INT NOT NULL,
     section INT NOT NULL,
     price NUMERIC(19, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_seats_tickets FOREIGN KEY (ticket_id) REFERENCES tickets(id),
-    CONSTRAINT fk_seats_venues FOREIGN KEY (venue_id) REFERENCES venues(id)
+    CONSTRAINT fk_seats_venues FOREIGN KEY (venue_id) REFERENCES venues(id),
+    CONSTRAINT uk_seats_venue_section_number UNIQUE (venue_id, section, number)
 );
 -- rollback DROP TABLE seats;
+
+-- changeset Yaroslav:create-tickets
+CREATE TABLE tickets(
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id UUID NOT NULL,
+    seat_id UUID NOT NULL,
+    order_id UUID NOT NULL,
+    price NUMERIC(19, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_tickets_events FOREIGN KEY (event_id) REFERENCES events(id),
+    CONSTRAINT fk_tickets_seats FOREIGN KEY (seat_id) REFERENCES seats(id),
+    CONSTRAINT fk_tickets_orders FOREIGN KEY (order_id) REFERENCES orders(id),
+    CONSTRAINT uk_tickets_event_seat UNIQUE (event_id, seat_id)
+);
+-- rollback DROP TABLE tickets;
 
 -- changeset Yaroslav:create-user-favorite-events
 CREATE TABLE user_favorite_events(
