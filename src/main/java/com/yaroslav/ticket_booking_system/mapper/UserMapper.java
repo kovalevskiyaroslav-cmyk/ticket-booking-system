@@ -16,13 +16,12 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "active", ignore = true)
     @Mapping(target = "orders", ignore = true)
     @Mapping(target = "favoriteEvents", ignore = true)
     User toEntity(UserRequestDto requestDto);
 
     @Mapping(source = "orders", target = "orderIds")
-    @Mapping(source = "favoriteEvents", target = "favouriteEventIds")
+    @Mapping(source = "favoriteEvents", target = "favoriteEventIds")
     UserResponseDto toDto(User user);
 
     default List<UUID> mapOrders(List<Order> orders) {

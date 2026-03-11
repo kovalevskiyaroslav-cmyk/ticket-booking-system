@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface OrderMapper {
 
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "dateTime", ignore = true)
+    @Mapping(target = "completedAt", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "totalPrice", ignore = true)
     @Mapping(target = "deleted", ignore = true)

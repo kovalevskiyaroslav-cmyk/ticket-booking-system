@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 public interface SeatMapper {
 
     @Mapping(target = "venue", ignore = true)
-    @Mapping(target = "ticket", ignore = true)
     Seat toEntity(SeatRequestDto requestDto);
 
     @Mapping(source = "venue.id", target = "venueId")
