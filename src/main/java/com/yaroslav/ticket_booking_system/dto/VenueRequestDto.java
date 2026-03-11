@@ -14,14 +14,10 @@ import lombok.Setter;
 public class VenueRequestDto {
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 200)
     private String name;
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 300)
     private String address;
-
-    @NotBlank
-    @Size(min = 1, max = 50)
-    private String city;
 }

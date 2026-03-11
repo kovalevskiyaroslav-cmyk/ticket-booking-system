@@ -1,6 +1,8 @@
 package com.yaroslav.ticket_booking_system.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,10 +20,12 @@ public class UserRequestDto {
     private String name;
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Email
+    @Size(min = 1, max = 255)
     private String email;
 
     @NotBlank
-    @Size(min = 1, max = 20)
+    @Pattern(regexp = "^[+]?[0-9\\s-()]{8,20}$",
+            message = "Invalid phone number format")
     private String phone;
 }

@@ -19,9 +19,10 @@ import java.util.UUID;
 public class EventRequestDto {
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 200)
     private String name;
 
+    @Size(max = 5000)
     private String description;
 
     @NotNull

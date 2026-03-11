@@ -1,5 +1,8 @@
 package com.yaroslav.ticket_booking_system.dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +15,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeatUpdateDto {
-    private Integer seatNum;
+
+    @Positive
+    @Min(1)
+    private Integer number;
+
+    @Positive
+    @Min(1)
     private Integer section;
+
+    @Positive
+    @DecimalMin(value = "0.01")
     private BigDecimal price;
 }

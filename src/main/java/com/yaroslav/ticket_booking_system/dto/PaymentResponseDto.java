@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -17,6 +16,5 @@ import java.util.UUID;
 public class PaymentResponseDto {
     private UUID id;
     private PaymentStatus status;
-    private BigDecimal paymentAmount;
-    private Instant timestamp;
+    private BigDecimal amount;
 }

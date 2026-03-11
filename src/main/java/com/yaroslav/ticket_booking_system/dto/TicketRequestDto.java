@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,10 +15,8 @@ import java.util.UUID;
 public class TicketRequestDto {
 
     @NotNull
-    private List<UUID> seatIds;
+    private UUID seatId;
 
     @NotNull
     private UUID eventId;
-
-    private UUID orderId;
 }

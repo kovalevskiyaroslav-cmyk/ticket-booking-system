@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderResponseDto {
     private UUID id;
-    private LocalDateTime dateTime;
+    private LocalDateTime completedAt;
     private OrderStatus status;
     private BigDecimal totalPrice;
     private UUID userId;

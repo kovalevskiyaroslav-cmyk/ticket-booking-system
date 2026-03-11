@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SeatResponseDto {
     private UUID id;
-    private Integer seatNum;
+    private Integer number;
     private Integer section;
     private BigDecimal price;
     private UUID venueId;
