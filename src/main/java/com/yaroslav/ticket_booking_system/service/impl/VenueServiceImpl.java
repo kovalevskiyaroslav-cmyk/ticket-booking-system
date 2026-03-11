@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -61,27 +60,15 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<VenueResponseDto> getVenuesByCity(String city) {
-
-        return venueRepository.findByCity(city)
-                .stream()
-                .map(venueMapper::toDto)
-                .toList();
-    }
-
-    @Override
     @Transactional
     public VenueResponseDto updateVenueById(UUID id, VenueUpdateDto updateDto) {
 
         final Venue venue = venueRepository.findById(id).orElseThrow(() -> new VenueNotFoundException(id));
 
-        if (updateDto.getCity() != null) {
-            venue.setCity(updateDto.getCity());
-        } else if (updateDto.getName() != null) {
+        if (updateDto.getName() != null) {
             venue.setName(updateDto.getName());
         }
-        else {
+        if (updateDto.getAddress() != null) {
             venue.setAddress(updateDto.getAddress());
         }
 

@@ -13,17 +13,13 @@ import java.util.UUID;
 public interface OrderService {
     OrderResponseDto createOrder(OrderRequestDto requestDto);
 
-    OrderResponseDto demonstratePartialSave(OrderRequestDto requestDto);
-
-    OrderResponseDto demonstrateTransaction(OrderRequestDto requestDto);
-
     OrderResponseDto getOrderById(UUID id);
 
     List<OrderResponseDto> getOrdersByStatus(OrderStatus orderStatus);
 
     List<OrderResponseDto> getOrdersByDeleted(Boolean deleted);
 
-    List<OrderResponseDto> getOrdersByDateTimeBetween(LocalDateTime dateTimeBefore, LocalDateTime dateTimeAfter);
+    List<OrderResponseDto> getOrdersByCompletedAtBetween(LocalDateTime start, LocalDateTime end);
 
     OrderResponseDto updateOrderById(UUID id, OrderUpdateDto updateDto);
 
@@ -32,8 +28,6 @@ public interface OrderService {
     OrderResponseDto removeTicketFromOrder(UUID id, UUID ticketId);
 
     OrderResponseDto softDeleteOrderById(UUID id);
-
-
 
     void deleteOrderById(UUID id);
 }

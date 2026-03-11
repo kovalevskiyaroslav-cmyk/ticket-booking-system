@@ -2,12 +2,14 @@ package com.yaroslav.ticket_booking_system.service.impl;
 
 import com.yaroslav.ticket_booking_system.dto.EventRequestDto;
 import com.yaroslav.ticket_booking_system.dto.EventResponseDto;
+import com.yaroslav.ticket_booking_system.dto.EventUpdateDto;
 import com.yaroslav.ticket_booking_system.exception.EventNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.VenueNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.EventMapper;
 import com.yaroslav.ticket_booking_system.model.Event;
 import com.yaroslav.ticket_booking_system.model.Venue;
 import com.yaroslav.ticket_booking_system.repository.EventRepository;
+import com.yaroslav.ticket_booking_system.repository.TicketRepository;
 import com.yaroslav.ticket_booking_system.repository.VenueRepository;
 import com.yaroslav.ticket_booking_system.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
+    private final TicketRepository ticketRepository;
     private final EventMapper eventMapper;
 
     @Override
@@ -61,10 +64,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventResponseDto> getEventsByDateTimeBetween(
-            LocalDateTime dateTimeBefore,
-            LocalDateTime dateTimeAfter) {
+            LocalDateTime start,
+            LocalDateTime end) {
 
-        return eventRepository.findByDateTimeBetween(dateTimeBefore, dateTimeAfter)
+        return eventRepository.findByDateTimeBetween(start, end)
                 .stream()
                 .map(eventMapper::toDto)
                 .toList();
@@ -72,14 +75,23 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventResponseDto updateById(UUID id, EventRequestDto requestDto) {
+    public EventResponseDto updateById(UUID id, EventUpdateDto updateDto) {
 
         final Event event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException(id));
-        event.setName(requestDto.getName());
-        event.setDescription(requestDto.getDescription());
-        event.setDateTime(requestDto.getDateTime());
-        event.setVenue(venueRepository.findById(requestDto.getVenueId())
-                .orElseThrow(() -> new VenueNotFoundException(requestDto.getVenueId())));
+
+        if (updateDto.getName() != null) {
+            event.setName(updateDto.getName());
+        }
+        if (updateDto.getDescription() != null) {
+            event.setDescription(updateDto.getDescription());
+        }
+        if (updateDto.getDateTime() != null) {
+            event.setDateTime(updateDto.getDateTime());
+        }
+        if (updateDto.getVenueId() != null) {
+            event.setVenue(venueRepository.findById(updateDto.getVenueId())
+                    .orElseThrow(() -> new VenueNotFoundException(updateDto.getVenueId())));
+        }
 
         return eventMapper.toDto(event);
     }
@@ -87,8 +99,16 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public void deleteById(UUID id) {
+        final Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
 
-        final Event event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException(id));
+        final boolean hasTickets = ticketRepository.existsByEventId(id);
+        if (hasTickets) {
+            throw new IllegalStateException(
+                    "Cannot delete event with ID: " + id + " because tickets have been sold."
+            );
+        }
+
         eventRepository.delete(event);
     }
 }

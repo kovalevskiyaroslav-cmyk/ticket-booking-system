@@ -2,6 +2,7 @@ package com.yaroslav.ticket_booking_system.service;
 
 import com.yaroslav.ticket_booking_system.dto.EventRequestDto;
 import com.yaroslav.ticket_booking_system.dto.EventResponseDto;
+import com.yaroslav.ticket_booking_system.dto.EventUpdateDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,9 +15,9 @@ public interface EventService {
 
     EventResponseDto getEventById(UUID id);
 
-    List<EventResponseDto> getEventsByDateTimeBetween(LocalDateTime dateTimeBefore, LocalDateTime dateTimeAfter);
+    List<EventResponseDto> getEventsByDateTimeBetween(LocalDateTime start, LocalDateTime end);
 
-    EventResponseDto updateById(UUID id, EventRequestDto requestDto);
+    EventResponseDto updateById(UUID id, EventUpdateDto updateDto);
 
     void deleteById(UUID id);
 }

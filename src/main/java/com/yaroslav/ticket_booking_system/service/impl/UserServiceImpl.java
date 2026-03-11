@@ -3,6 +3,8 @@ package com.yaroslav.ticket_booking_system.service.impl;
 import com.yaroslav.ticket_booking_system.dto.UserRequestDto;
 import com.yaroslav.ticket_booking_system.dto.UserResponseDto;
 import com.yaroslav.ticket_booking_system.dto.UserUpdateDto;
+import com.yaroslav.ticket_booking_system.exception.DuplicateEmailException;
+import com.yaroslav.ticket_booking_system.exception.DuplicatePhoneException;
 import com.yaroslav.ticket_booking_system.exception.EventNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.UserNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.UserMapper;
@@ -29,8 +31,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto createUser(UserRequestDto requestDto) {
 
+        if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
+            throw new DuplicateEmailException(requestDto.getEmail());
+        }
+        if (userRepository.findByPhone(requestDto.getPhone()).isPresent()) {
+            throw new DuplicatePhoneException(requestDto.getPhone());
+        }
+
         final User user = userMapper.toEntity(requestDto);
-        user.setActive(true);
 
         return userMapper.toDto(userRepository.save(user));
     }
@@ -78,10 +86,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto addFavoriteEventToUser(UUID id, UUID eventId) {
 
-        final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(id));
+        final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
 
         final User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        user.getFavoriteEvents().add(event);
+        user.addFavoriteEvent(event);
 
         return userMapper.toDto(user);
     }
@@ -90,10 +98,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto removeFavoriteEventFromUser(UUID id, UUID eventId) {
 
-        final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(id));
+        final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
 
         final User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        user.getFavoriteEvents().remove(event);
+        user.removeFavoriteEvent(event);
 
         return userMapper.toDto(user);
     }
@@ -106,13 +114,24 @@ public class UserServiceImpl implements UserService {
 
         if (updateDto.getName() != null) {
             user.setName(updateDto.getName());
-        } else if (updateDto.getPhone() != null) {
-            user.setPhone(updateDto.getPhone());
-        } else if (updateDto.getEmail() != null) {
+        }
+        if (updateDto.getEmail() != null) {
+            userRepository.findByEmail(updateDto.getEmail())
+                    .ifPresent(existingUser -> {
+                        if (!existingUser.getId().equals(id)) {
+                            throw new DuplicateEmailException(updateDto.getEmail());
+                        }
+                    });
             user.setEmail(updateDto.getEmail());
         }
-        else {
-            user.setActive(updateDto.getActive());
+        if (updateDto.getPhone() != null) {
+            userRepository.findByPhone(updateDto.getPhone())
+                    .ifPresent(existingUser -> {
+                        if (!existingUser.getId().equals(id)) {
+                            throw new DuplicatePhoneException(updateDto.getPhone());
+                        }
+                    });
+            user.setPhone(updateDto.getPhone());
         }
 
         return userMapper.toDto(user);

@@ -13,11 +13,11 @@ public interface SeatService {
 
     SeatResponseDto getSeatById(UUID id);
 
-    SeatResponseDto getSeatBySeatNum(Integer seatNum);
+    SeatResponseDto getSeatByVenueIdAndNumber(UUID venueId, Integer number);
 
-    List<SeatResponseDto> getSeatsBySection(Integer section);
+    List<SeatResponseDto> getSeatsByVenueIdAndSection(UUID venueId, Integer section);
 
-    List<SeatResponseDto> getSeatsByPriceBetween(BigDecimal lowerPrice, BigDecimal higherPrice);
+    List<SeatResponseDto> getSeatsByPriceBetween(BigDecimal min, BigDecimal max);
 
     SeatResponseDto updateSeatById(UUID id, SeatUpdateDto updateDto);
 

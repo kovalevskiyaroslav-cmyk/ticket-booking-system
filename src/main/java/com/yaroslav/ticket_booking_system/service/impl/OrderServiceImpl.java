@@ -6,7 +6,6 @@ import com.yaroslav.ticket_booking_system.dto.OrderUpdateDto;
 import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
 import com.yaroslav.ticket_booking_system.exception.EventNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.OrderNotFoundException;
-import com.yaroslav.ticket_booking_system.exception.OrderTransactionException;
 import com.yaroslav.ticket_booking_system.exception.SeatNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.TicketNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.UserNotFoundException;
@@ -21,7 +20,6 @@ import com.yaroslav.ticket_booking_system.model.Ticket;
 import com.yaroslav.ticket_booking_system.model.User;
 import com.yaroslav.ticket_booking_system.repository.EventRepository;
 import com.yaroslav.ticket_booking_system.repository.OrderRepository;
-import com.yaroslav.ticket_booking_system.repository.PaymentRepository;
 import com.yaroslav.ticket_booking_system.repository.SeatRepository;
 import com.yaroslav.ticket_booking_system.repository.TicketRepository;
 import com.yaroslav.ticket_booking_system.repository.UserRepository;
@@ -31,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +44,6 @@ public class OrderServiceImpl implements OrderService {
     private final TicketRepository ticketRepository;
     private final SeatRepository seatRepository;
     private final EventRepository eventRepository;
-    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional
@@ -59,63 +54,41 @@ public class OrderServiceImpl implements OrderService {
 
         final Order order = new Order(user);
 
-        return orderMapper.toDto(orderRepository.save(order));
-    }
+        if (requestDto.getTicketDtos() != null && !requestDto.getTicketDtos().isEmpty()) {
+            for (TicketRequestDto ticketDto : requestDto.getTicketDtos()) {
 
-    @Override
-    //@Transactional
-    public OrderResponseDto demonstratePartialSave(OrderRequestDto requestDto) {
+                final Event event = eventRepository.findById(ticketDto.getEventId())
+                        .orElseThrow(() -> new EventNotFoundException(ticketDto.getEventId()));
 
-        final User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(requestDto.getUserId()));
+                final Seat seat = seatRepository.findById(ticketDto.getSeatId())
+                        .orElseThrow(() -> new SeatNotFoundException(ticketDto.getSeatId()));
 
-        final Order order = new Order(user);
+                final boolean seatTaken = ticketRepository.existsByEventIdAndSeatId(
+                        ticketDto.getEventId(),
+                        ticketDto.getSeatId()
+                );
 
-        final Order savedOrder = orderRepository.save(order);
-        log.info("Payment saved: {}", savedOrder.getId());
+                if (seatTaken) {
+                    throw new IllegalStateException(
+                            "Seat " + seat.getNumber() + " is already reserved for event: " + event.getName()
+                    );
+                }
 
-        final Payment payment = new Payment();
-        payment.setStatus(PaymentStatus.PENDING);
-        payment.setPaymentAmount(BigDecimal.ZERO);
-        payment.setTimestamp(Instant.now());
+                final Ticket ticket = new Ticket();
+                ticket.setEvent(event);
+                ticket.setSeat(seat);
+                ticket.setPrice(seat.getPrice());
 
-        if (Instant.now().getEpochSecond() > 0) {
-            throw new OrderTransactionException("Error - partial save");
+                order.addTicket(ticket);
+            }
         }
 
-        payment.setOrder(savedOrder);
-        final Payment savedPayment = paymentRepository.save(payment);
-        log.info("Payment saved: {}", savedPayment.getId());
-
-        savedOrder.setPayment(savedPayment);
-        orderRepository.save(savedOrder);
-
-        return orderMapper.toDto(savedOrder);
-    }
-
-    @Override
-    @Transactional
-    public OrderResponseDto demonstrateTransaction(OrderRequestDto requestDto) {
-
-        final User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(requestDto.getUserId()));
-
-        final Order order = new Order(user);
-        final Order savedOrder = orderRepository.save(order);
-
         final Payment payment = new Payment();
+        payment.setAmount(order.getTotalPrice());
         payment.setStatus(PaymentStatus.PENDING);
-        payment.setPaymentAmount(BigDecimal.ZERO);
-        payment.setTimestamp(Instant.now());
+        order.setPayment(payment);
 
-        if (Instant.now().getEpochSecond() > 0) {
-            throw new OrderTransactionException("Error - no save");
-        }
-
-        payment.setOrder(savedOrder);
-        final Payment savedPayment = paymentRepository.save(payment);
-
-        savedOrder.setPayment(savedPayment);
+        final Order savedOrder = orderRepository.save(order);
 
         return orderMapper.toDto(savedOrder);
     }
@@ -151,9 +124,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderResponseDto> getOrdersByDateTimeBetween(LocalDateTime dateTimeBefore, LocalDateTime dateTimeAfter) {
+    public List<OrderResponseDto> getOrdersByCompletedAtBetween(LocalDateTime start, LocalDateTime end) {
 
-        return orderRepository.findByDateTimeBetween(dateTimeBefore, dateTimeAfter)
+        return orderRepository.findByCompletedAtBetween(start, end)
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
@@ -179,19 +152,28 @@ public class OrderServiceImpl implements OrderService {
         final Event event = eventRepository.findById(requestDto.getEventId())
                 .orElseThrow(() -> new EventNotFoundException(requestDto.getEventId()));
 
-        final Ticket ticket = new Ticket(order, event);
+        final Seat seat = seatRepository.findById(requestDto.getSeatId())
+                .orElseThrow(() -> new SeatNotFoundException(requestDto.getSeatId()));
 
-        for (UUID seatId : requestDto.getSeatIds()) {
-            final Seat seat = seatRepository.findById(seatId)
-                    .orElseThrow(() -> new SeatNotFoundException(seatId));
-            ticket.addSeat(seat);
+        final boolean seatTaken = ticketRepository.existsByEventIdAndSeatId(
+                requestDto.getEventId(),
+                requestDto.getSeatId()
+        );
+
+        if (seatTaken) {
+            throw new IllegalStateException("Seat is already reserved for this event");
         }
+
+        final Ticket ticket = new Ticket();
+        ticket.setEvent(event);
+        ticket.setSeat(seat);
+        ticket.setPrice(seat.getPrice());
 
         order.addTicket(ticket);
 
-        ticketRepository.save(ticket);
+        final Order savedOrder = orderRepository.save(order);
 
-        return orderMapper.toDto(order);
+        return orderMapper.toDto(savedOrder);
     }
 
     @Override
@@ -206,17 +188,11 @@ public class OrderServiceImpl implements OrderService {
                 .findFirst()
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
-        final List<Seat> seats = ticket.getSeats();
-        for (Seat seat : seats) {
-            seat.setTicket(null);
-        }
-        ticket.getSeats().clear();
-
         order.removeTicket(ticket);
 
-        ticketRepository.delete(ticket);
+        final Order savedOrder = orderRepository.save(order);
 
-        return orderMapper.toDto(order);
+        return orderMapper.toDto(savedOrder);
     }
 
     @Override

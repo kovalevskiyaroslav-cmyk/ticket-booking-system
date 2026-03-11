@@ -9,6 +9,7 @@ import com.yaroslav.ticket_booking_system.mapper.SeatMapper;
 import com.yaroslav.ticket_booking_system.model.Seat;
 import com.yaroslav.ticket_booking_system.model.Venue;
 import com.yaroslav.ticket_booking_system.repository.SeatRepository;
+import com.yaroslav.ticket_booking_system.repository.TicketRepository;
 import com.yaroslav.ticket_booking_system.repository.VenueRepository;
 import com.yaroslav.ticket_booking_system.service.SeatService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class SeatServiceImpl implements SeatService {
 
     private final SeatRepository seatRepository;
     private final VenueRepository venueRepository;
+    private final TicketRepository ticketRepository;
     private final SeatMapper seatMapper;
 
     @Override
@@ -52,19 +54,19 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     @Transactional(readOnly = true)
-    public SeatResponseDto getSeatBySeatNum(Integer seatNum) {
+    public SeatResponseDto getSeatByVenueIdAndNumber(UUID venueId, Integer number) {
 
-        final Seat seat = seatRepository.findBySeatNum(seatNum)
-                .orElseThrow(() -> new SeatNotFoundException("Seat not found with number: " + seatNum));
+        final Seat seat = seatRepository.findByVenueIdAndNumber(venueId, number)
+                .orElseThrow(() -> new SeatNotFoundException("Seat not found with number: " + number));
 
         return seatMapper.toDto(seat);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<SeatResponseDto> getSeatsBySection(Integer section) {
+    public List<SeatResponseDto> getSeatsByVenueIdAndSection(UUID venueId, Integer section) {
 
-        return seatRepository.findBySection(section)
+        return seatRepository.findByVenueIdAndSection(venueId, section)
                 .stream()
                 .map(seatMapper::toDto)
                 .toList();
@@ -72,9 +74,9 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SeatResponseDto> getSeatsByPriceBetween(BigDecimal lowerPrice, BigDecimal higherPrice) {
+    public List<SeatResponseDto> getSeatsByPriceBetween(BigDecimal min, BigDecimal max) {
 
-        return seatRepository.findByPriceBetween(lowerPrice, higherPrice)
+        return seatRepository.findByPriceBetween(min, max)
                 .stream()
                 .map(seatMapper::toDto)
                 .toList();
@@ -86,12 +88,13 @@ public class SeatServiceImpl implements SeatService {
 
         final Seat seat = seatRepository.findById(id).orElseThrow(() -> new SeatNotFoundException(id));
 
-        if (updateDto.getSeatNum() != null) {
-            seat.setSeatNum(updateDto.getSeatNum());
-        } else if (updateDto.getSection() != null) {
+        if (updateDto.getNumber() != null) {
+            seat.setNumber(updateDto.getNumber());
+        }
+        if (updateDto.getSection() != null) {
             seat.setSection(updateDto.getSection());
         }
-        else {
+        if (updateDto.getPrice() != null) {
             seat.setPrice(updateDto.getPrice());
         }
 
@@ -103,6 +106,15 @@ public class SeatServiceImpl implements SeatService {
     public void deleteSeatById(UUID id) {
 
         final Seat seat = seatRepository.findById(id).orElseThrow(() -> new SeatNotFoundException(id));
+
+        final boolean hasTickets = ticketRepository.existsBySeatId(id);
+        if (hasTickets) {
+            throw new IllegalStateException(
+                    "Cannot delete seat with ID: " + id + " because it has associated tickets. " +
+                            "This would break order history and payment records."
+            );
+        }
+
         seatRepository.delete(seat);
     }
 }
