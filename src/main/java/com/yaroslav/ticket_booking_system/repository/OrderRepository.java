@@ -27,8 +27,5 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findByDeleted(Boolean deleted);
 
     @EntityGraph(attributePaths = {"user", "payment", "tickets"})
-    List<Order> findByDateTimeBetween(LocalDateTime dateTimeBefore, LocalDateTime dateTimeAfter);
-
-    @EntityGraph(attributePaths = {"payment"})
-    List<Order> findByUserId(UUID userId);
+    List<Order> findByCompletedAtBetween(LocalDateTime start, LocalDateTime end);
 }

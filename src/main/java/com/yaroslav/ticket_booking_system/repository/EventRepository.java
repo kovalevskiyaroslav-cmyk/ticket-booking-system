@@ -15,5 +15,5 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     Optional<Event> findByName(String name);
 
     @EntityGraph(attributePaths = {"venue"})
-    List<Event> findByDateTimeBetween(LocalDateTime dateTimeBefore, LocalDateTime dateTimeAfter);
+    List<Event> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);
 }

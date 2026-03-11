@@ -12,11 +12,11 @@ import java.util.UUID;
 public interface SeatRepository extends JpaRepository<Seat, UUID> {
 
     @EntityGraph(attributePaths = {"venue"})
-    Optional<Seat> findBySeatNum(Integer seatNum);
+    Optional<Seat> findByVenueIdAndNumber(UUID venueId, Integer number);
 
     @EntityGraph(attributePaths = {"venue"})
-    List<Seat> findBySection(Integer section);
+    List<Seat> findByVenueIdAndSection(UUID venueId, Integer section);
 
     @EntityGraph(attributePaths = {"venue"})
-    List<Seat> findByPriceBetween(BigDecimal lowerPrice, BigDecimal higherPrice);
+    List<Seat> findByPriceBetween(BigDecimal min, BigDecimal max);
 }
