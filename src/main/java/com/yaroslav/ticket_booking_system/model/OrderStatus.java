@@ -14,7 +14,7 @@ public enum OrderStatus {
         this.allowedNext = allowedNext;
     }
 
-    boolean canTransitionTo(OrderStatus next) {
+    boolean cannotTransitionTo(OrderStatus next) {
         return !allowedNext.contains(next);
     }
 }
