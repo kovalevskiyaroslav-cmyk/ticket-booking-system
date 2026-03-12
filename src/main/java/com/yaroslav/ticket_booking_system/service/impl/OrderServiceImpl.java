@@ -51,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new UserNotFoundException(requestDto.getUserId()));
 
         final Order order = new Order(user);
+        final Order savedOrder = orderRepository.save(order);
 
         if (requestDto.getTicketDtos() != null && !requestDto.getTicketDtos().isEmpty()) {
             for (TicketRequestDto ticketDto : requestDto.getTicketDtos()) {
@@ -76,8 +77,9 @@ public class OrderServiceImpl implements OrderService {
                 ticket.setEvent(event);
                 ticket.setSeat(seat);
                 ticket.setPrice(seat.getPrice());
+                ticketRepository.save(ticket);
 
-                order.addTicket(ticket);
+                savedOrder.addTicket(ticket);
             }
         }
 
@@ -86,9 +88,7 @@ public class OrderServiceImpl implements OrderService {
         payment.setStatus(PaymentStatus.PENDING);
         order.setPayment(payment);
 
-        final Order savedOrder = orderRepository.save(order);
-
-        return orderMapper.toDto(savedOrder);
+        return orderMapper.toDto(orderRepository.save(savedOrder));
     }
 
     @Override
