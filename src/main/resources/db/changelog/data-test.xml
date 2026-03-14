@@ -7,149 +7,132 @@
 
     <changeSet id="venues" author="Yaroslav">
         <insert tableName="venues">
-            <column name="id" value="11111111-1111-1111-1111-111111111111"/>
-            <column name="name" value="Main Hall"/>
-            <column name="address" value="123 Main St"/>
+            <column name="id" value="26e72fe6-7573-405f-803e-a7cb7b9387f7"/>
+            <column name="name" value="Grand City Concert Hall"/>
+            <column name="address" value="125 Riverside Avenue, New York"/>
         </insert>
         <insert tableName="venues">
-            <column name="id" value="22222222-2222-2222-2222-222222222222"/>
-            <column name="name" value="Concert Arena"/>
-            <column name="address" value="456 Arena Blvd"/>
-            <!-- city removed - not in entity -->
+            <column name="id" value="680254e9-50ee-4e7b-a4b2-d954d17040bd"/>
+            <column name="name" value="Metropolitan Music Arena"/>
+            <column name="address" value="450 Madison Boulevard, New York"/>
         </insert>
     </changeSet>
 
-    <!-- 2. Users -->
     <changeSet id="users" author="Yaroslav">
         <insert tableName="users">
-            <column name="id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"/>
-            <column name="name" value="Alice"/>
-            <column name="email" value="alice@example.com"/>
-            <column name="phone" value="1234567890"/>
-            <!-- active removed - not in entity -->
+            <column name="id" value="2bee94e4-e13c-42b6-bcd6-4c418decfc30"/>
+            <column name="name" value="Alice Johnson"/>
+            <column name="email" value="alice.johnson@example.com"/>
+            <column name="phone" value="+12125550123"/>
         </insert>
         <insert tableName="users">
-            <column name="id" value="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"/>
-            <column name="name" value="Bob"/>
-            <column name="email" value="bob@example.com"/>
-            <column name="phone" value="0987654321"/>
-            <!-- active removed - not in entity -->
+            <column name="id" value="bd99e2d8-9be8-4c6f-93ed-62d3eed518dc"/>
+            <column name="name" value="Robert Miller"/>
+            <column name="email" value="robert.miller@example.com"/>
+            <column name="phone" value="+12125550789"/>
         </insert>
     </changeSet>
 
-    <!-- 3. Payments -->
     <changeSet id="payments" author="Yaroslav">
         <insert tableName="payments">
-            <column name="id" value="dddddddd-dddd-dddd-dddd-dddddddddddd"/>
+            <column name="id" value="2843b0dd-b624-4b58-bde3-7cfe924c9ace"/>
             <column name="status" value="PENDING"/>
-            <column name="amount" valueNumeric="50.00"/>  <!-- Fixed: payment_amount → amount -->
-            <!-- timestamp removed - not in entity -->
+            <column name="amount" valueNumeric="89.99"/>
         </insert>
         <insert tableName="payments">
-            <column name="id" value="ffffffff-ffff-ffff-ffff-ffffffffffff"/>
+            <column name="id" value="b1838712-ad8d-4c9a-991f-dc4a0bfd4203"/>
             <column name="status" value="PENDING"/>
-            <column name="amount" valueNumeric="55.00"/>  <!-- Fixed: payment_amount → amount -->
-            <!-- timestamp removed - not in entity -->
+            <column name="amount" valueNumeric="120.00"/>
         </insert>
     </changeSet>
 
-    <!-- 4. Orders -->
     <changeSet id="orders" author="Yaroslav">
         <insert tableName="orders">
-            <column name="id" value="cccccccc-cccc-cccc-cccc-cccccccccccc"/>
-            <column name="completed_at" valueDate="2026-03-01T12:00:00"/>  <!-- Fixed: date_time → completed_at -->
+            <column name="id" value="83ba4bbd-9588-497b-a04a-1036edc3e0a2"/>
+            <column name="completed_at" valueDate="2026-03-01T12:00:00"/>
             <column name="status" value="CREATED"/>
-            <column name="total_price" valueNumeric="50.00"/>
+            <column name="total_price" valueNumeric="89.99"/>
             <column name="deleted" valueBoolean="false"/>
-            <column name="user_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"/>
-            <column name="payment_id" value="dddddddd-dddd-dddd-dddd-dddddddddddd"/>
+            <column name="user_id" value="2bee94e4-e13c-42b6-bcd6-4c418decfc30"/>
+            <column name="payment_id" value="2843b0dd-b624-4b58-bde3-7cfe924c9ace"/>
         </insert>
         <insert tableName="orders">
-            <column name="id" value="eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"/>
-            <column name="completed_at" valueDate="2026-03-01T12:05:00"/>  <!-- Fixed: date_time → completed_at -->
+            <column name="id" value="812815d6-e76d-4d00-8f16-d02ac679a893"/>
+            <column name="completed_at" valueDate="2026-03-02T15:30:00"/>
             <column name="status" value="CREATED"/>
-            <column name="total_price" valueNumeric="55.00"/>
+            <column name="total_price" valueNumeric="120.00"/>
             <column name="deleted" valueBoolean="false"/>
-            <column name="user_id" value="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"/>
-            <column name="payment_id" value="ffffffff-ffff-ffff-ffff-ffffffffffff"/>
+            <column name="user_id" value="bd99e2d8-9be8-4c6f-93ed-62d3eed518dc"/>
+            <column name="payment_id" value="b1838712-ad8d-4c9a-991f-dc4a0bfd4203"/>
         </insert>
     </changeSet>
 
-    <!-- 5. Events -->
     <changeSet id="events" author="Yaroslav">
         <insert tableName="events">
-            <column name="id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa01"/>
-            <column name="name" value="Rock Concert"/>
-            <column name="description" value="Best rock concert"/>
+            <column name="id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
+            <column name="name" value="Legends of Rock Live"/>
+            <column name="description" value="A high-energy rock concert featuring classic hits and legendary guitar solos."/>
             <column name="date_time" valueDate="2026-03-10T20:00:00"/>
-            <column name="venue_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="venue_id" value="26e72fe6-7573-405f-803e-a7cb7b9387f7"/>
         </insert>
         <insert tableName="events">
-            <column name="id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa02"/>
-            <column name="name" value="Classical Night"/>
-            <column name="description" value="Evening of classical music"/>
+            <column name="id" value="abf243cd-4daa-47ee-904f-e4ecbcc720f2"/>
+            <column name="name" value="Symphony Under the Stars"/>
+            <column name="description" value="An evening of timeless classical music performed by the Metropolitan Symphony Orchestra."/>
             <column name="date_time" valueDate="2026-03-11T19:00:00"/>
-            <column name="venue_id" value="22222222-2222-2222-2222-222222222222"/>
+            <column name="venue_id" value="680254e9-50ee-4e7b-a4b2-d954d17040bd"/>
         </insert>
     </changeSet>
 
-    <!-- 6. Seats (MUST be before tickets) -->
     <changeSet id="seats" author="Yaroslav">
         <insert tableName="seats">
-            <column name="id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa11"/>
-            <column name="number" valueNumeric="1"/>  <!-- Fixed: seat_num → number -->
+            <column name="id" value="0f96cef9-6522-42b5-ae35-7ca415fdba4c"/>
+            <column name="number" valueNumeric="1"/>
             <column name="section" valueNumeric="1"/>
-            <column name="price" valueNumeric="50.00"/>
-            <column name="venue_id" value="11111111-1111-1111-1111-111111111111"/>
-            <!-- ticket_id removed - not in entity -->
+            <column name="price" valueNumeric="89.99"/>
+            <column name="venue_id" value="26e72fe6-7573-405f-803e-a7cb7b9387f7"/>
         </insert>
         <insert tableName="seats">
-            <column name="id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa12"/>
-            <column name="number" valueNumeric="2"/>  <!-- Fixed: seat_num → number -->
-            <column name="section" valueNumeric="1"/>
-            <column name="price" valueNumeric="55.00"/>
-            <column name="venue_id" value="22222222-2222-2222-2222-222222222222"/>
-            <!-- ticket_id removed -->
+            <column name="id" value="adc70aa1-2492-460f-84b6-46c800b48342"/>
+            <column name="number" valueNumeric="12"/>
+            <column name="section" valueNumeric="2"/>
+            <column name="price" valueNumeric="120.00"/>
+            <column name="venue_id" value="680254e9-50ee-4e7b-a4b2-d954d17040bd"/>
         </insert>
         <insert tableName="seats">
-            <column name="id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa13"/>
-            <column name="number" valueNumeric="3"/>  <!-- Fixed: seat_num → number -->
-            <column name="section" valueNumeric="1"/>
-            <column name="price" valueNumeric="55.00"/>
-            <column name="venue_id" value="22222222-2222-2222-2222-222222222222"/>
-            <!-- ticket_id removed -->
+            <column name="id" value="343b506a-41af-451a-9858-5e50f0d9649e"/>
+            <column name="number" valueNumeric="13"/>
+            <column name="section" valueNumeric="2"/>
+            <column name="price" valueNumeric="120.00"/>
+            <column name="venue_id" value="680254e9-50ee-4e7b-a4b2-d954d17040bd"/>
         </insert>
     </changeSet>
 
-    <!-- 7. Tickets (NOW with seat_id) -->
     <changeSet id="tickets" author="Yaroslav">
         <insert tableName="tickets">
-            <column name="id" value="11111111-1111-1111-1111-111111111111"/>
-            <column name="seat_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa11"/>  <!-- Added -->
-            <column name="price" valueNumeric="50.00"/>
-            <column name="event_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa01"/>
-            <column name="order_id" value="cccccccc-cccc-cccc-cccc-cccccccccccc"/>
-            <!-- purchase_date_time removed - not in entity -->
+            <column name="id" value="a6aae4f0-da7d-453f-97c0-d7cfbad11f19"/>
+            <column name="seat_id" value="0f96cef9-6522-42b5-ae35-7ca415fdba4c"/>
+            <column name="price" valueNumeric="89.99"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
+            <column name="order_id" value="83ba4bbd-9588-497b-a04a-1036edc3e0a2"/>
         </insert>
         <insert tableName="tickets">
-            <column name="id" value="22222222-2222-2222-2222-222222222222"/>
-            <column name="seat_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa12"/>  <!-- Added -->
-            <column name="price" valueNumeric="55.00"/>
-            <column name="event_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa02"/>
-            <column name="order_id" value="eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"/>
-            <!-- purchase_date_time removed -->
+            <column name="id" value="2ce7e6c2-fa56-48e9-8226-22e00e1c43e0"/>
+            <column name="seat_id" value="adc70aa1-2492-460f-84b6-46c800b48342"/>
+            <column name="price" valueNumeric="120.00"/>
+            <column name="event_id" value="abf243cd-4daa-47ee-904f-e4ecbcc720f2"/>
+            <column name="order_id" value="812815d6-e76d-4d00-8f16-d02ac679a893"/>
         </insert>
     </changeSet>
 
-    <!-- 8. User Favorite Events -->
     <changeSet id="user-favorite-events" author="Yaroslav">
         <insert tableName="user_favorite_events">
-            <column name="user_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"/>
-            <column name="event_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa01"/>
+            <column name="user_id" value="2bee94e4-e13c-42b6-bcd6-4c418decfc30"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
         </insert>
         <insert tableName="user_favorite_events">
-            <column name="user_id" value="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"/>
-            <column name="event_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa02"/>
+            <column name="user_id" value="bd99e2d8-9be8-4c6f-93ed-62d3eed518dc"/>
+            <column name="event_id" value="abf243cd-4daa-47ee-904f-e4ecbcc720f2"/>
         </insert>
     </changeSet>
 
