@@ -74,6 +74,16 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<EventResponseDto> getAllEvents() {
+
+        return eventRepository.findAll()
+                .stream()
+                .map(eventMapper::toDto)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public EventResponseDto updateById(UUID id, EventUpdateDto updateDto) {
 

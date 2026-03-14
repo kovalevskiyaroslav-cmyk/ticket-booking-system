@@ -41,4 +41,12 @@ public class PaymentController {
         final List<PaymentResponseDto> payments = paymentService.getPaymentsByStatus(status);
         return ResponseEntity.ok(payments);
     }
+
+    @GetMapping
+    public ResponseEntity<List<PaymentResponseDto>> getAllPayments() {
+
+        final List<PaymentResponseDto> payments = paymentService.getAllPayments();
+
+        return ResponseEntity.ok(payments);
+    }
 }

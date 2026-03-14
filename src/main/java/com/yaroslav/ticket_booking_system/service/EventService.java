@@ -17,6 +17,8 @@ public interface EventService {
 
     List<EventResponseDto> getEventsByDateTimeBetween(LocalDateTime start, LocalDateTime end);
 
+    List<EventResponseDto> getAllEvents();
+
     EventResponseDto updateById(UUID id, EventUpdateDto updateDto);
 
     void deleteById(UUID id);

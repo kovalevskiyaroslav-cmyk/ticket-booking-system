@@ -19,6 +19,8 @@ public interface SeatService {
 
     List<SeatResponseDto> getSeatsByPriceBetween(BigDecimal min, BigDecimal max);
 
+    List<SeatResponseDto> getAllSeats();
+
     SeatResponseDto updateSeatById(UUID id, SeatUpdateDto updateDto);
 
     void deleteSeatById(UUID id);

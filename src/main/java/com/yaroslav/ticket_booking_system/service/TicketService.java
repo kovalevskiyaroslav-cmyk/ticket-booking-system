@@ -12,4 +12,6 @@ public interface TicketService {
     List<TicketResponseDto> getTicketsByPriceBetween(BigDecimal min, BigDecimal max);
 
     List<TicketResponseDto> getTicketsByEventId(UUID id);
+
+    List<TicketResponseDto> getAllTickets();
 }

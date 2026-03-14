@@ -13,4 +13,6 @@ public interface PaymentService {
     List<PaymentResponseDto> getPaymentsByAmountBetween(BigDecimal min, BigDecimal max);
 
     List<PaymentResponseDto> getPaymentsByStatus(PaymentStatus status);
+
+    List<PaymentResponseDto> getAllPayments();
 }

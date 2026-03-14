@@ -83,6 +83,16 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<SeatResponseDto> getAllSeats() {
+
+        return seatRepository.findAll()
+                .stream()
+                .map(seatMapper::toDto)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public SeatResponseDto updateSeatById(UUID id, SeatUpdateDto updateDto) {
 

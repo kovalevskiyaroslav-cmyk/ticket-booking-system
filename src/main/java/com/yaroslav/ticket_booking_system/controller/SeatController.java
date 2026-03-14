@@ -74,6 +74,14 @@ public class SeatController {
         return ResponseEntity.ok(seats);
     }
 
+    @GetMapping
+    public ResponseEntity<List<SeatResponseDto>> getAllSeats() {
+
+        final List<SeatResponseDto> seats = seatService.getAllSeats();
+
+        return ResponseEntity.ok(seats);
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<SeatResponseDto> updateSeatById(@PathVariable UUID id, @RequestBody SeatUpdateDto updateDto) {
 

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -80,6 +81,16 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
 
         return userMapper.toDto(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getAllUsers() {
+
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Override

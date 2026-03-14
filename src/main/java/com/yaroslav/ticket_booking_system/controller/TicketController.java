@@ -46,4 +46,12 @@ public class TicketController {
 
         return ResponseEntity.ok(tickets);
     }
+
+    @GetMapping
+    public ResponseEntity<List<TicketResponseDto>> getAllTickets() {
+
+        final List<TicketResponseDto> tickets = ticketService.getAllTickets();
+
+        return ResponseEntity.ok(tickets);
+    }
 }

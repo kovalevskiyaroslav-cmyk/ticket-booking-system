@@ -4,6 +4,7 @@ import com.yaroslav.ticket_booking_system.dto.UserRequestDto;
 import com.yaroslav.ticket_booking_system.dto.UserResponseDto;
 import com.yaroslav.ticket_booking_system.dto.UserUpdateDto;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -16,6 +17,8 @@ public interface UserService {
     UserResponseDto getUserByPhone(String phone);
 
     UserResponseDto getUserByEmail(String email);
+
+    List<UserResponseDto> getAllUsers();
 
     UserResponseDto addFavoriteEventToUser(UUID id, UUID eventId);
 

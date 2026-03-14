@@ -73,6 +73,14 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping
+    public ResponseEntity<List<OrderResponseDto>> getAllOrders() {
+
+        final List<OrderResponseDto> orders = orderService.getAllOrders();
+
+        return ResponseEntity.ok(orders);
+    }
+
     @PatchMapping("/add/{id}")
     public ResponseEntity<OrderResponseDto> addTicketToOrder(
             @PathVariable UUID id,

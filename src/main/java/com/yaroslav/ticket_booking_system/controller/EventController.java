@@ -63,6 +63,14 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+    @GetMapping
+    public ResponseEntity<List<EventResponseDto>> getAllEvents() {
+
+        final List<EventResponseDto> events = eventService.getAllEvents();
+
+        return ResponseEntity.ok(events);
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<EventResponseDto> updateEventById(@PathVariable UUID id, @RequestBody EventUpdateDto updateDto) {
 

@@ -52,4 +52,14 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(paymentMapper::toDto)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaymentResponseDto> getAllPayments() {
+
+        return paymentRepository.findAll()
+                .stream()
+                .map(paymentMapper::toDto)
+                .toList();
+    }
 }

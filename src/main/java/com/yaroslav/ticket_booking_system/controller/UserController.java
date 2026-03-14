@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -63,6 +64,14 @@ public class UserController {
         final UserResponseDto user = userService.getUserByEmail(email);
 
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+
+        final List<UserResponseDto> users = userService.getAllUsers();
+
+        return ResponseEntity.ok(users);
     }
 
     @PatchMapping("/{id}/events/{eventId}")

@@ -21,6 +21,8 @@ public interface OrderService {
 
     List<OrderResponseDto> getOrdersByCompletedAtBetween(LocalDateTime start, LocalDateTime end);
 
+    List<OrderResponseDto> getAllOrders();
+
     OrderResponseDto updateOrderById(UUID id, OrderUpdateDto updateDto);
 
     OrderResponseDto addTicketToOrder(UUID id, TicketRequestDto requestDto);

@@ -53,4 +53,14 @@ public class TicketServiceImpl implements TicketService {
                 .map(ticketMapper::toDto)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TicketResponseDto> getAllTickets() {
+
+        return ticketRepository.findAll()
+                .stream()
+                .map(ticketMapper::toDto)
+                .toList();
+    }
 }

@@ -77,9 +77,10 @@ public class OrderServiceImpl implements OrderService {
                 ticket.setEvent(event);
                 ticket.setSeat(seat);
                 ticket.setPrice(seat.getPrice());
-                ticketRepository.save(ticket);
 
                 savedOrder.addTicket(ticket);
+
+                ticketRepository.save(ticket);
             }
         }
 
@@ -125,6 +126,16 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponseDto> getOrdersByCompletedAtBetween(LocalDateTime start, LocalDateTime end) {
 
         return orderRepository.findByCompletedAtBetween(start, end)
+                .stream()
+                .map(orderMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getAllOrders() {
+
+        return orderRepository.findAll()
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
