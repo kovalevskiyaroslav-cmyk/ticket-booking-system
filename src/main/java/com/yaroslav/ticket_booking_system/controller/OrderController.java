@@ -7,6 +7,9 @@ import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
 import com.yaroslav.ticket_booking_system.model.OrderStatus;
 import com.yaroslav.ticket_booking_system.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,6 +82,16 @@ public class OrderController {
         final List<OrderResponseDto> orders = orderService.getAllOrders();
 
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/by-venue/{venueId}")
+    public ResponseEntity<Page<OrderResponseDto>> getOrdersByVenuePaged(
+            @PathVariable UUID venueId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(orderService.getOrdersByVenuePaged(venueId, pageable));
     }
 
     @PatchMapping("/add/{id}")

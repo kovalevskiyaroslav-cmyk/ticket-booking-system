@@ -5,6 +5,8 @@ import com.yaroslav.ticket_booking_system.dto.OrderResponseDto;
 import com.yaroslav.ticket_booking_system.dto.OrderUpdateDto;
 import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
 import com.yaroslav.ticket_booking_system.model.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +24,8 @@ public interface OrderService {
     List<OrderResponseDto> getOrdersByCompletedAtBetween(LocalDateTime start, LocalDateTime end);
 
     List<OrderResponseDto> getAllOrders();
+
+    Page<OrderResponseDto> getOrdersByVenuePaged(UUID venueId, Pageable pageable);
 
     OrderResponseDto updateOrderById(UUID id, OrderUpdateDto updateDto);
 

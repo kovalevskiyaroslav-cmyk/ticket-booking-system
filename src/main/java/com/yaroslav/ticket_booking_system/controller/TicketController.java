@@ -3,6 +3,10 @@ package com.yaroslav.ticket_booking_system.controller;
 import com.yaroslav.ticket_booking_system.dto.TicketResponseDto;
 import com.yaroslav.ticket_booking_system.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,5 +57,17 @@ public class TicketController {
         final List<TicketResponseDto> tickets = ticketService.getAllTickets();
 
         return ResponseEntity.ok(tickets);
+    }
+
+    @GetMapping("/by-venue/{venueId}")
+    public ResponseEntity<Page<TicketResponseDto>> getTicketsByVenue(
+            @PathVariable UUID venueId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("price").ascending());
+        Page<TicketResponseDto> ticketsPage = ticketService.getTicketsByVenue(venueId, pageable);
+
+        return ResponseEntity.ok(ticketsPage);
     }
 }

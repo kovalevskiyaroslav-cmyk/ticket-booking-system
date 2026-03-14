@@ -7,6 +7,8 @@ import com.yaroslav.ticket_booking_system.model.Ticket;
 import com.yaroslav.ticket_booking_system.repository.TicketRepository;
 import com.yaroslav.ticket_booking_system.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,5 +64,14 @@ public class TicketServiceImpl implements TicketService {
                 .stream()
                 .map(ticketMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<TicketResponseDto> getTicketsByVenue(UUID venueId, Pageable pageable) {
+
+        Page<Ticket> tickets = ticketRepository.findTicketsByVenueId(venueId, pageable);
+
+        return tickets.map(ticketMapper::toDto);
     }
 }

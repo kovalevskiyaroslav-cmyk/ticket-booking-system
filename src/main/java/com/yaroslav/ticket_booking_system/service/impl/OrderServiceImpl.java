@@ -25,6 +25,8 @@ import com.yaroslav.ticket_booking_system.repository.TicketRepository;
 import com.yaroslav.ticket_booking_system.repository.UserRepository;
 import com.yaroslav.ticket_booking_system.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -139,6 +141,13 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDto> getOrdersByVenuePaged(UUID venueId, Pageable pageable) {
+        return orderRepository.findOrdersByVenueId(venueId, pageable)
+                .map(orderMapper::toDto);
     }
 
     @Override
