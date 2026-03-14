@@ -85,13 +85,13 @@ public class OrderController {
     }
 
     @GetMapping("/by-venue/{venueId}")
-    public ResponseEntity<Page<OrderResponseDto>> getOrdersByVenuePaged(
+    public ResponseEntity<Page<OrderResponseDto>> getOrdersByVenue(
             @PathVariable UUID venueId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(orderService.getOrdersByVenuePaged(venueId, pageable));
+        return ResponseEntity.ok(orderService.getOrdersByVenue(venueId, pageable));
     }
 
     @PatchMapping("/add/{id}")

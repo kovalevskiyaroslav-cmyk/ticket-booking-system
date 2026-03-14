@@ -1,5 +1,7 @@
 package com.yaroslav.ticket_booking_system.service.impl;
 
+import com.yaroslav.ticket_booking_system.cache.QueryCacheService;
+import com.yaroslav.ticket_booking_system.cache.QueryKey;
 import com.yaroslav.ticket_booking_system.dto.TicketResponseDto;
 import com.yaroslav.ticket_booking_system.exception.TicketNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.TicketMapper;
@@ -22,6 +24,7 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
     private final TicketMapper ticketMapper;
+    private final QueryCacheService cacheService;
 
     @Override
     @Transactional(readOnly = true)
@@ -70,8 +73,19 @@ public class TicketServiceImpl implements TicketService {
     @Transactional(readOnly = true)
     public Page<TicketResponseDto> getTicketsByVenue(UUID venueId, Pageable pageable) {
 
-        Page<Ticket> tickets = ticketRepository.findTicketsByVenueId(venueId, pageable);
+        QueryKey key = new QueryKey("getTicketsByVenue", venueId,
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
-        return tickets.map(ticketMapper::toDto);
+        if (cacheService.containsKey(key)) {
+            System.out.println("[CACHE HIT] getTicketsByVenue: " + venueId + " page " + pageable.getPageNumber());
+            return cacheService.getPage(key, TicketResponseDto.class);
+        }
+
+        Page<Ticket> tickets = ticketRepository.findTicketsByVenueId(venueId, pageable);
+        Page<TicketResponseDto> ticketPage = tickets.map(ticketMapper::toDto);
+
+        cacheService.put(key, ticketPage);
+
+        return ticketPage;
     }
 }

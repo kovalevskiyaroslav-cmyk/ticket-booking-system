@@ -25,7 +25,7 @@ public interface OrderService {
 
     List<OrderResponseDto> getAllOrders();
 
-    Page<OrderResponseDto> getOrdersByVenuePaged(UUID venueId, Pageable pageable);
+    Page<OrderResponseDto> getOrdersByVenue(UUID venueId, Pageable pageable);
 
     OrderResponseDto updateOrderById(UUID id, OrderUpdateDto updateDto);
 
