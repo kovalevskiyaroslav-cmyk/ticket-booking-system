@@ -2,6 +2,7 @@ package com.yaroslav.ticket_booking_system.service.impl;
 
 
 import com.yaroslav.ticket_booking_system.dto.PaymentResponseDto;
+import com.yaroslav.ticket_booking_system.dto.PaymentUpdateDto;
 import com.yaroslav.ticket_booking_system.exception.PaymentNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.PaymentMapper;
 import com.yaroslav.ticket_booking_system.model.Payment;
@@ -61,5 +62,16 @@ public class PaymentServiceImpl implements PaymentService {
                 .stream()
                 .map(paymentMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public PaymentResponseDto updatePaymentById(UUID id, PaymentUpdateDto updateDto) {
+
+        final Payment payment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(id));
+
+        payment.setStatus(updateDto.getStatus());
+
+        return paymentMapper.toDto(payment);
     }
 }

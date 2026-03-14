@@ -85,37 +85,4 @@ public class Order extends AbstractAuditableEntity {
         ticket.setOrder(null);
         totalPrice = totalPrice.subtract(ticket.getPrice());
     }
-
-    public void pay() {
-        if (status.cannotTransitionTo(OrderStatus.PAID)) {
-            throw new IllegalStateException("Cannot mark order as PAID from " + status);
-        }
-
-        status = OrderStatus.PAID;
-        payment.complete();
-    }
-
-    public void cancel() {
-        if (status.cannotTransitionTo(OrderStatus.CANCELLED)) {
-            throw new IllegalStateException("Cannot mark order as CANCELLED from " + status);
-        }
-
-        if (status == OrderStatus.PAID) {
-            payment.refund();
-        } else if (status == OrderStatus.CREATED) {
-            payment.fail();
-        }
-
-        status = OrderStatus.CANCELLED;
-        payment.fail();
-    }
-
-    public void refund() {
-        if (status.cannotTransitionTo(OrderStatus.REFUNDED)) {
-            throw new IllegalStateException("Cannot mark order as CANCELLED from " + status);
-        }
-
-        status = OrderStatus.REFUNDED;
-        payment.refund();
-    }
 }

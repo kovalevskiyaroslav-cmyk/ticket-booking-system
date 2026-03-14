@@ -1,6 +1,7 @@
 package com.yaroslav.ticket_booking_system.service;
 
 import com.yaroslav.ticket_booking_system.dto.PaymentResponseDto;
+import com.yaroslav.ticket_booking_system.dto.PaymentUpdateDto;
 import com.yaroslav.ticket_booking_system.model.PaymentStatus;
 
 import java.math.BigDecimal;
@@ -15,4 +16,6 @@ public interface PaymentService {
     List<PaymentResponseDto> getPaymentsByStatus(PaymentStatus status);
 
     List<PaymentResponseDto> getAllPayments();
+
+    PaymentResponseDto updatePaymentById(UUID id, PaymentUpdateDto updateDto);
 }

@@ -1,12 +1,15 @@
 package com.yaroslav.ticket_booking_system.controller;
 
 import com.yaroslav.ticket_booking_system.dto.PaymentResponseDto;
+import com.yaroslav.ticket_booking_system.dto.PaymentUpdateDto;
 import com.yaroslav.ticket_booking_system.model.PaymentStatus;
 import com.yaroslav.ticket_booking_system.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,5 +51,15 @@ public class PaymentController {
         final List<PaymentResponseDto> payments = paymentService.getAllPayments();
 
         return ResponseEntity.ok(payments);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<PaymentResponseDto> updatePaymentById(
+            @PathVariable UUID id,
+            @RequestBody PaymentUpdateDto updateDto) {
+
+        final PaymentResponseDto payment = paymentService.updatePaymentById(id, updateDto);
+
+        return ResponseEntity.ok(payment);
     }
 }

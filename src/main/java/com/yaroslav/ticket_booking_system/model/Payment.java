@@ -38,16 +38,4 @@ public class Payment extends AbstractAuditableEntity {
 
     @OneToOne(mappedBy = "payment")
     private Order order;
-
-    public void refund() {
-        status = PaymentStatus.REFUNDED;
-    }
-
-    public void complete() {
-        status = PaymentStatus.COMPLETED;
-    }
-
-    public void fail() {
-        status = PaymentStatus.FAILED;
-    }
 }
