@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Component
 public class QueryCacheService {
@@ -18,20 +17,24 @@ public class QueryCacheService {
     }
 
     public <T> List<T> getList(QueryKey key, Class<T> elementType) {
-        Object value = cache.get(key);
+        final Object value = cache.get(key);
+
         if (value instanceof List<?>) {
             return ((List<?>) value).stream()
                     .map(elementType::cast)
-                    .collect(Collectors.toList());
+                    .toList();
         }
-        return null;
+
+        return List.of();
     }
 
     public <T> Page<T> getPage(QueryKey key, Class<T> elementType) {
-        Object value = cache.get(key);
+        final Object value = cache.get(key);
+
         if (value instanceof Page<?>) {
             return ((Page<?>) value).map(elementType::cast);
         }
+
         return null;
     }
 
@@ -48,6 +51,7 @@ public class QueryCacheService {
     }
 
     public void evictByPattern(String pattern) {
+
         cache.keySet().removeIf(key ->
                 key.toString().contains(pattern)
         );

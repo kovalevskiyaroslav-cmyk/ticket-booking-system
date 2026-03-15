@@ -14,9 +14,14 @@ public class QueryKey {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        QueryKey queryKey = (QueryKey) o;
+        if (this == o)  {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final QueryKey queryKey = (QueryKey) o;
         return Objects.equals(methodName, queryKey.methodName) &&
                 Arrays.deepEquals(params, queryKey.params);
     }

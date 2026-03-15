@@ -9,6 +9,7 @@ import com.yaroslav.ticket_booking_system.model.Ticket;
 import com.yaroslav.ticket_booking_system.repository.TicketRepository;
 import com.yaroslav.ticket_booking_system.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
     private final TicketMapper ticketMapper;
     private final QueryCacheService cacheService;
+
+    private static final String CACHE_HIT = "[CACHE HIT] ";
+    private static final String TICKETS_BY_VENUE = "getTicketsByVenue";
+    private static final String LOG_FORMAT = "{} {}: {}";
 
     @Override
     @Transactional(readOnly = true)
@@ -73,16 +79,16 @@ public class TicketServiceImpl implements TicketService {
     @Transactional(readOnly = true)
     public Page<TicketResponseDto> getTicketsByVenue(UUID venueId, Pageable pageable) {
 
-        QueryKey key = new QueryKey("getTicketsByVenue", venueId,
+        final QueryKey key = new QueryKey(TICKETS_BY_VENUE, venueId,
                 pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
         if (cacheService.containsKey(key)) {
-            System.out.println("[CACHE HIT] getTicketsByVenue: " + venueId + " page " + pageable.getPageNumber());
+            log.info(LOG_FORMAT, CACHE_HIT, TICKETS_BY_VENUE, venueId + " page " + pageable.getPageNumber());
             return cacheService.getPage(key, TicketResponseDto.class);
         }
 
-        Page<Ticket> tickets = ticketRepository.findTicketsByVenueId(venueId, pageable);
-        Page<TicketResponseDto> ticketPage = tickets.map(ticketMapper::toDto);
+        final Page<Ticket> tickets = ticketRepository.findTicketsByVenueId(venueId, pageable);
+        final Page<TicketResponseDto> ticketPage = tickets.map(ticketMapper::toDto);
 
         cacheService.put(key, ticketPage);
 

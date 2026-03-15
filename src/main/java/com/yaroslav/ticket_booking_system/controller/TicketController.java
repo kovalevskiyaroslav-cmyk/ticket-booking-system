@@ -65,8 +65,8 @@ public class TicketController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("price").ascending());
-        Page<TicketResponseDto> ticketsPage = ticketService.getTicketsByVenue(venueId, pageable);
+        final Pageable pageable = PageRequest.of(page, size, Sort.by("price").ascending());
+        final Page<TicketResponseDto> ticketsPage = ticketService.getTicketsByVenue(venueId, pageable);
 
         return ResponseEntity.ok(ticketsPage);
     }
