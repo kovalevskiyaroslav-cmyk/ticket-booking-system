@@ -15,14 +15,7 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
 
-    @Query("""
-        SELECT DISTINCT o
-        FROM Order o
-        LEFT JOIN FETCH o.user
-        LEFT JOIN FETCH o.payment
-        LEFT JOIN FETCH o.tickets
-        WHERE o.status = :status
-        """)
+    @EntityGraph(attributePaths = {"user", "payment", "tickets"})
     List<Order> findByStatus(@Param("status") OrderStatus status);
 
     @EntityGraph(attributePaths = {"user", "payment", "tickets"})
