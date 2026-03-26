@@ -31,5 +31,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
         JOIN t.event e
         WHERE e.venue.name = :name
         """)
+    @EntityGraph(attributePaths = {"user", "payment", "tickets"})
     Page<Order> findOrdersByVenueName(@Param("name") String name, Pageable pageable);
 }
