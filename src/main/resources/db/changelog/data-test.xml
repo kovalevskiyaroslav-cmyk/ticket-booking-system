@@ -226,14 +226,14 @@
             <column name="name" value="Electronic Dance Festival"/>
             <column name="description" value="A night of pulsating EDM beats with top DJs from around the world."/>
             <column name="date_time" valueDate="2026-03-13T22:00:00"/>
-            <column name="venue_id" value="26e72fe6-7573-405f-803e-a7cb7b9387f7"/>
+            <column name="venue_id" value="680254e9-50ee-4e7b-a4b2-d954d17040bd"/>
         </insert>
         <insert tableName="events">
             <column name="id" value="a6ea935e-a856-4913-8c38-8a108f40ad55"/>
             <column name="name" value="Broadway Hits Live"/>
             <column name="description" value="Experience the magic of Broadway with live performances of your favorite musicals."/>
             <column name="date_time" valueDate="2026-03-14T19:30:00"/>
-            <column name="venue_id" value="26e72fe6-7573-405f-803e-a7cb7b9387f7"/>
+            <column name="venue_id" value="680254e9-50ee-4e7b-a4b2-d954d17040bd"/>
         </insert>
         <insert tableName="events">
             <column name="id" value="f47ac10b-58cc-4372-a567-0e02b2c3d479"/>
@@ -350,35 +350,35 @@
             <column name="id" value="2ce7e6c2-fa56-48e9-8226-22e00e1c43e0"/>
             <column name="seat_id" value="adc70aa1-2492-460f-84b6-46c800b48342"/>
             <column name="price" valueNumeric="120.00"/>
-            <column name="event_id" value="abf243cd-4daa-47ee-904f-e4ecbcc720f2"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="812815d6-e76d-4d00-8f16-d02ac679a893"/>
         </insert>
         <insert tableName="tickets">
             <column name="id" value="b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e"/>
             <column name="seat_id" value="28b9a78f-3100-429f-8f62-1e54fab9840f"/>
             <column name="price" valueNumeric="95.50"/>
-            <column name="event_id" value="c12f56ab-9e34-4d21-8b7c-1a2b3c4d5e6f"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="9a4b7c8d-1e2f-3a4b-5c6d-7e8f9a0b1c2d"/>
         </insert>
         <insert tableName="tickets">
             <column name="id" value="c4d5e6f7-a8b9-4c0d-1e2f-3a4b5c6d7e8f"/>
             <column name="seat_id" value="f1e60de1-15e3-4215-907d-6f7da4297f95"/>
             <column name="price" valueNumeric="125.00"/>
-            <column name="event_id" value="d23a67bc-1f45-4e32-9c8d-2b3c4d5e6f7a"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="8b7a6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d"/>
         </insert>
         <insert tableName="tickets">
             <column name="id" value="d5e6f7a8-b9c0-4d1e-2f3a-4b5c6d7e8f9a"/>
             <column name="seat_id" value="fae49868-0594-4247-baf1-9204e2466789"/>
             <column name="price" valueNumeric="130.00"/>
-            <column name="event_id" value="d23a67bc-1f45-4e32-9c8d-2b3c4d5e6f7a"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="8b7a6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d"/>
         </insert>
         <insert tableName="tickets">
             <column name="id" value="e6f7a8b9-c0d1-4e2f-3a4b-5c6d7e8f9a0b"/>
             <column name="seat_id" value="422ff650-8356-4df1-a2a6-f56337e55038"/>
             <column name="price" valueNumeric="100.00"/>
-            <column name="event_id" value="a6ea935e-a856-4913-8c38-8a108f40ad55"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="7c6b5a4d-3e2f-1a0b-9c8d-7e6f5a4b3c2d"/>
         </insert>
         <insert tableName="tickets">
@@ -392,28 +392,28 @@
             <column name="id" value="a8b9c0d1-e2f3-4a4b-5c6d-7e8f9a0b1c2d"/>
             <column name="seat_id" value="838daea4-a94c-4b79-8788-e012aae918ba"/>
             <column name="price" valueNumeric="135.00"/>
-            <column name="event_id" value="abf243cd-4daa-47ee-904f-e4ecbcc720f2"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="5e4d3c2b-1a0f-9e8d-7c6b-5a4f3e2d1c0b"/>
         </insert>
         <insert tableName="tickets">
             <column name="id" value="b9c0d1e2-f3a4-4b5c-6d7e-8f9a0b1c2d3e"/>
             <column name="seat_id" value="343b506a-41af-451a-9858-5e50f0d9649e"/>
             <column name="price" valueNumeric="120.00"/>
-            <column name="event_id" value="abf243cd-4daa-47ee-904f-e4ecbcc720f2"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="5e4d3c2b-1a0f-9e8d-7c6b-5a4f3e2d1c0b"/>
         </insert>
         <insert tableName="tickets">
             <column name="id" value="c0d1e2f3-a4b5-4c6d-7e8f-9a0b1c2d3e4f"/>
             <column name="seat_id" value="451944a1-19e9-4235-a0e6-dea4ff8c101e"/>
             <column name="price" valueNumeric="105.00"/>
-            <column name="event_id" value="c12f56ab-9e34-4d21-8b7c-1a2b3c4d5e6f"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="4f3e2d1c-0b9a-8f7e-6d5c-4b3a2f1e0d9c"/>
         </insert>
         <insert tableName="tickets">
             <column name="id" value="d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"/>
-            <column name="seat_id" value="fae49868-0594-4247-baf1-9204e2466789"/>
+            <column name="seat_id" value="8d7c6b5a-4f3e-2d1c-0b9a-8f7e6d5c4b3a"/>
             <column name="price" valueNumeric="130.00"/>
-            <column name="event_id" value="f47ac10b-58cc-4372-a567-0e02b2c3d479"/>
+            <column name="event_id" value="ae6e48c9-c229-4d28-bf3c-82b6d4310d28"/>
             <column name="order_id" value="3e2d1c0b-9a8f-7e6d-5c4b-3a2f1e0d9c8b"/>
         </insert>
         <insert tableName="tickets">

@@ -84,15 +84,15 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/by-venue/{venueId}")
-    public ResponseEntity<Page<OrderResponseDto>> getOrdersByVenue(
-            @PathVariable UUID venueId,
+    @GetMapping("/by-venue/{name}")
+    public ResponseEntity<Page<OrderResponseDto>> getOrdersByVenueName(
+            @PathVariable String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         final Pageable pageable = PageRequest.of(page, size);
 
-        return ResponseEntity.ok(orderService.getOrdersByVenue(venueId, pageable));
+        return ResponseEntity.ok(orderService.getOrdersByVenueName(name, pageable));
     }
 
     @PatchMapping("/add/{id}")

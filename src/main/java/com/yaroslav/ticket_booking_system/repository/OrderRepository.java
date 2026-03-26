@@ -29,7 +29,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
         FROM Order o
         JOIN o.tickets t
         JOIN t.event e
-        WHERE e.venue.id = :venueId
+        WHERE e.venue.name = :name
         """)
-    Page<Order> findOrdersByVenueId(@Param("venueId") UUID venueId, Pageable pageable);
+    Page<Order> findOrdersByVenueName(@Param("name") String name, Pageable pageable);
 }

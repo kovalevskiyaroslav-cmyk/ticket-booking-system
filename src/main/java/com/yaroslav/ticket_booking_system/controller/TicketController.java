@@ -59,14 +59,14 @@ public class TicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    @GetMapping("/by-venue/{venueId}")
-    public ResponseEntity<Page<TicketResponseDto>> getTicketsByVenue(
-            @PathVariable UUID venueId,
+    @GetMapping("/by-event/{name}")
+    public ResponseEntity<Page<TicketResponseDto>> getTicketsByEventName(
+            @PathVariable String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         final Pageable pageable = PageRequest.of(page, size, Sort.by("price").ascending());
-        final Page<TicketResponseDto> ticketsPage = ticketService.getTicketsByVenue(venueId, pageable);
+        final Page<TicketResponseDto> ticketsPage = ticketService.getTicketsByEventName(name, pageable);
 
         return ResponseEntity.ok(ticketsPage);
     }

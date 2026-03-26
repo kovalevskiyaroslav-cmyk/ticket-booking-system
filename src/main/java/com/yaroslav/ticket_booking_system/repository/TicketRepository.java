@@ -25,16 +25,9 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
         SELECT t.*
         FROM tickets t
         JOIN events e ON t.event_id = e.id
-        WHERE e.venue_id = :venueId
-        """,
-            countQuery = """
-        SELECT COUNT(*)
-        FROM tickets t
-        JOIN events e ON t.event_id = e.id
-        WHERE e.venue_id = :venueId
-        """,
-            nativeQuery = true)
-    Page<Ticket> findTicketsByVenueId(@Param("venueId") UUID venueId, Pageable pageable);
+        WHERE e.name = :name
+        """, nativeQuery = true)
+    Page<Ticket> findTicketsByEventName(@Param("name") String name, Pageable pageable);
 
     boolean existsByEventIdAndSeatId(@NotNull UUID eventId, @NotNull UUID seatId);
 

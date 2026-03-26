@@ -77,17 +77,17 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<TicketResponseDto> getTicketsByVenue(UUID venueId, Pageable pageable) {
+    public Page<TicketResponseDto> getTicketsByEventName(String name, Pageable pageable) {
 
-        final QueryKey key = new QueryKey(TICKETS_BY_VENUE, venueId,
+        final QueryKey key = new QueryKey(TICKETS_BY_VENUE, name,
                 pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
         if (cacheService.containsKey(key)) {
-            log.info(LOG_FORMAT, CACHE_HIT, TICKETS_BY_VENUE, venueId + " page " + pageable.getPageNumber());
+            log.info(LOG_FORMAT, CACHE_HIT, TICKETS_BY_VENUE, name + " page " + pageable.getPageNumber());
             return cacheService.getPage(key, TicketResponseDto.class);
         }
 
-        final Page<Ticket> tickets = ticketRepository.findTicketsByVenueId(venueId, pageable);
+        final Page<Ticket> tickets = ticketRepository.findTicketsByEventName(name, pageable);
         final Page<TicketResponseDto> ticketPage = tickets.map(ticketMapper::toDto);
 
         cacheService.put(key, ticketPage);

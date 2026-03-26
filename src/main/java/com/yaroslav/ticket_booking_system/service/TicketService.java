@@ -17,5 +17,5 @@ public interface TicketService {
 
     List<TicketResponseDto> getAllTickets();
 
-    Page<TicketResponseDto> getTicketsByVenue(UUID venueId, Pageable pageable);
+    Page<TicketResponseDto> getTicketsByEventName(String name, Pageable pageable);
 }

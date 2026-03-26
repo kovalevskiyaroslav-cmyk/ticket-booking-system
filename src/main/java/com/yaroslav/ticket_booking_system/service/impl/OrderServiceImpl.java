@@ -50,14 +50,8 @@ public class OrderServiceImpl implements OrderService {
     private final EventRepository eventRepository;
     private final QueryCacheService cacheService;
 
-    public static final String ORDER_BY_ID = "getOrderById";
-    public static final String ORDERS_BY_STATUS = "getOrdersByStatus";
-    public static final String ORDERS_BY_DELETED = "getOrdersByDeleted";
-    public static final String ORDERS_BY_COMPLETED_AT = "getOrdersByCompletedAtBetween";
-    public static final String ALL_ORDERS = "getAllOrders";
     public static final String ORDERS_BY_VENUE = "getOrdersByVenue";
     public static final String CACHE_HIT = "[CACHE HIT] ";
-    private static final String LOG_FORMAT = "{} {}: {}";
 
     @Override
     @Transactional
@@ -107,9 +101,6 @@ public class OrderServiceImpl implements OrderService {
 
         final OrderResponseDto createdOrder = orderMapper.toDto(orderRepository.save(savedOrder));
 
-        cacheService.evict(new QueryKey(ORDERS_BY_STATUS, OrderStatus.CREATED));
-        cacheService.evict(new QueryKey(ORDERS_BY_DELETED, false));
-        cacheService.evictByPattern(ALL_ORDERS);
         cacheService.evictByPattern(ORDERS_BY_VENUE);
 
         return createdOrder;
@@ -119,124 +110,70 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderResponseDto getOrderById(UUID id) {
 
-        final QueryKey key = new QueryKey(ORDER_BY_ID, id);
-
-        if (cacheService.containsKey(key)) {
-            log.info(LOG_FORMAT, CACHE_HIT, ORDER_BY_ID, id);
-            return cacheService.get(key, OrderResponseDto.class);
-        }
-
         final Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
-        final OrderResponseDto dto = orderMapper.toDto(order);
-        cacheService.put(key, dto);
-
-        return dto;
+        return orderMapper.toDto(order);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrdersByStatus(OrderStatus orderStatus) {
 
-        final QueryKey key = new QueryKey(ORDERS_BY_STATUS, orderStatus);
-
-        if (cacheService.containsKey(key)) {
-            log.info(LOG_FORMAT, CACHE_HIT, ORDERS_BY_STATUS, orderStatus);
-            return cacheService.getList(key, OrderResponseDto.class);
-        }
-
-        final List<OrderResponseDto> orders = orderRepository.findByStatus(orderStatus)
+        return orderRepository.findByStatus(orderStatus)
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
-
-        cacheService.put(key, orders);
-
-        return orders;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrdersByDeleted(Boolean deleted) {
 
-        final QueryKey key = new QueryKey(ORDERS_BY_DELETED, deleted);
-
-        if (cacheService.containsKey(key)) {
-            log.info(LOG_FORMAT, CACHE_HIT, ORDERS_BY_DELETED, deleted);
-            return cacheService.getList(key, OrderResponseDto.class);
-        }
-
-        final List<OrderResponseDto> orders = orderRepository.findByDeleted(deleted)
+        return orderRepository.findByDeleted(deleted)
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
-
-        cacheService.put(key, orders);
-
-        return orders;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrdersByCompletedAtBetween(LocalDateTime start, LocalDateTime end) {
 
-        final QueryKey key = new QueryKey(ORDERS_BY_COMPLETED_AT, start, end);
-
-        if (cacheService.containsKey(key)) {
-            log.info("{} {}: {} to {}", CACHE_HIT, ORDERS_BY_COMPLETED_AT, start, end);
-            return cacheService.getList(key, OrderResponseDto.class);
-        }
-
-        final List<OrderResponseDto> orders = orderRepository.findByCompletedAtBetween(start, end)
+        return orderRepository.findByCompletedAtBetween(start, end)
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
-
-        cacheService.put(key, orders);
-
-        return orders;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getAllOrders() {
 
-        final QueryKey key = new QueryKey(ALL_ORDERS);
-
-        if (cacheService.containsKey(key)) {
-            log.info("{} {}", CACHE_HIT, ALL_ORDERS);
-            return cacheService.getList(key, OrderResponseDto.class);
-        }
-
-        final List<OrderResponseDto> orders = orderRepository.findAll()
+        return orderRepository.findAll()
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
-
-        cacheService.put(key, orders);
-
-        return orders;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> getOrdersByVenue(UUID venueId, Pageable pageable) {
+    public Page<OrderResponseDto> getOrdersByVenueName(String name, Pageable pageable) {
 
         final QueryKey key = new QueryKey(
                 ORDERS_BY_VENUE,
-                venueId,
+                name,
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 pageable.getSort()
         );
 
         if (cacheService.containsKey(key)) {
-            log.info("{} {}: {} page {}", CACHE_HIT, ORDERS_BY_VENUE, venueId, pageable.getPageNumber());
+            log.info("{} {}: {} page {}", CACHE_HIT, ORDERS_BY_VENUE, name, pageable.getPageNumber());
             return cacheService.getPage(key, OrderResponseDto.class);
         }
 
-        final Page<OrderResponseDto> orders = orderRepository.findOrdersByVenueId(venueId, pageable)
+        final Page<OrderResponseDto> orders = orderRepository.findOrdersByVenueName(name, pageable)
                 .map(orderMapper::toDto);
 
         cacheService.put(key, orders);
@@ -251,23 +188,14 @@ public class OrderServiceImpl implements OrderService {
         final Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
 
         if (updateDto.getStatus() != null) {
-            final OrderStatus oldStatus = order.getStatus();
             order.setStatus(updateDto.getStatus());
-
-            cacheService.evict(new QueryKey(ORDERS_BY_STATUS, oldStatus));
-            cacheService.evict(new QueryKey(ORDERS_BY_STATUS, updateDto.getStatus()));
         }
         if (updateDto.getCompletedAt() != null) {
             order.setCompletedAt(updateDto.getCompletedAt());
-
-            cacheService.evictByPattern(ORDERS_BY_COMPLETED_AT);
         }
 
         final OrderResponseDto updatedOrder = orderMapper.toDto(order);
 
-        cacheService.evict(new QueryKey(ORDER_BY_ID, id));
-        cacheService.evict(new QueryKey(ORDERS_BY_DELETED, order.getDeleted()));
-        cacheService.evictByPattern(ALL_ORDERS);
         cacheService.evictByPattern(ORDERS_BY_VENUE);
 
         return updatedOrder;
@@ -301,7 +229,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.addTicket(ticket);
 
-        return getOrderResponseDtoWithCacheEviction(id, order);
+        return getOrderResponseDtoWithCacheEviction(order);
     }
 
     @Override
@@ -317,18 +245,13 @@ public class OrderServiceImpl implements OrderService {
 
         order.removeTicket(ticket);
 
-        return getOrderResponseDtoWithCacheEviction(id, order);
+        return getOrderResponseDtoWithCacheEviction(order);
     }
 
-    private OrderResponseDto getOrderResponseDtoWithCacheEviction(UUID id, Order order) {
+    private OrderResponseDto getOrderResponseDtoWithCacheEviction(Order order) {
         final Order savedOrder = orderRepository.save(order);
         final OrderResponseDto updatedOrder = orderMapper.toDto(savedOrder);
 
-        cacheService.evict(new QueryKey(ORDER_BY_ID, id));
-        cacheService.evict(new QueryKey(ORDERS_BY_STATUS, savedOrder.getStatus()));
-        cacheService.evict(new QueryKey(ORDERS_BY_DELETED, savedOrder.getDeleted()));
-        cacheService.evictByPattern(ALL_ORDERS);
-        cacheService.evictByPattern(ORDERS_BY_COMPLETED_AT);
         cacheService.evictByPattern(ORDERS_BY_VENUE);
 
         return updatedOrder;
@@ -345,11 +268,6 @@ public class OrderServiceImpl implements OrderService {
 
         final OrderResponseDto updatedOrder = orderMapper.toDto(order);
 
-        cacheService.evict(new QueryKey(ORDER_BY_ID, id));
-        cacheService.evict(new QueryKey(ORDERS_BY_STATUS, order.getStatus()));
-        cacheService.evictByPattern(ORDERS_BY_DELETED);
-        cacheService.evictByPattern(ALL_ORDERS);
-        cacheService.evictByPattern(ORDERS_BY_COMPLETED_AT);
         cacheService.evictByPattern(ORDERS_BY_VENUE);
 
         return updatedOrder;
@@ -361,16 +279,8 @@ public class OrderServiceImpl implements OrderService {
 
         final Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
 
-        final OrderStatus orderStatus = order.getStatus();
-        final Boolean orderDeleted = order.getDeleted();
-
         orderRepository.delete(order);
 
-        cacheService.evict(new QueryKey(ORDER_BY_ID, id));
-        cacheService.evict(new QueryKey(ORDERS_BY_STATUS, orderStatus));
-        cacheService.evict(new QueryKey(ORDERS_BY_DELETED, orderDeleted));
-        cacheService.evictByPattern(ALL_ORDERS);
-        cacheService.evictByPattern(ORDERS_BY_COMPLETED_AT);
         cacheService.evictByPattern(ORDERS_BY_VENUE);
     }
 }
