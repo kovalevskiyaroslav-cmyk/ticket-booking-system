@@ -3,6 +3,7 @@ package com.yaroslav.ticket_booking_system.service.impl;
 import com.yaroslav.ticket_booking_system.dto.SeatRequestDto;
 import com.yaroslav.ticket_booking_system.dto.SeatResponseDto;
 import com.yaroslav.ticket_booking_system.dto.SeatUpdateDto;
+import com.yaroslav.ticket_booking_system.exception.DuplicateSeatException;
 import com.yaroslav.ticket_booking_system.exception.SeatNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.VenueNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.SeatMapper;
@@ -35,6 +36,19 @@ public class SeatServiceImpl implements SeatService {
 
         final Venue venue = venueRepository.findById(requestDto.getVenueId())
                 .orElseThrow(() -> new VenueNotFoundException(requestDto.getVenueId()));
+
+        boolean seatExists = seatRepository.existsByVenueIdAndSectionAndNumber(
+                requestDto.getVenueId(),
+                requestDto.getSection(),
+                requestDto.getNumber()
+        );
+        if (seatExists) {
+            throw new DuplicateSeatException(
+                    requestDto.getVenueId(),
+                    requestDto.getSection(),
+                    requestDto.getNumber()
+            );
+        }
 
         final Seat seat = seatMapper.toEntity(requestDto);
         seat.setVenue(venue);

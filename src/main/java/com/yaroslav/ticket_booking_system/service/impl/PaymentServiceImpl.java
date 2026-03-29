@@ -2,6 +2,7 @@ package com.yaroslav.ticket_booking_system.service.impl;
 
 import com.yaroslav.ticket_booking_system.dto.PaymentResponseDto;
 import com.yaroslav.ticket_booking_system.dto.PaymentUpdateDto;
+import com.yaroslav.ticket_booking_system.exception.InvalidPaymentStatusTransitionException;
 import com.yaroslav.ticket_booking_system.exception.PaymentNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.PaymentMapper;
 import com.yaroslav.ticket_booking_system.model.Payment;
@@ -69,6 +70,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         final Payment payment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(id));
 
+        if (payment.getStatus().cannotTransitionTo(updateDto.getStatus())) {
+            throw new InvalidPaymentStatusTransitionException(payment.getStatus(), updateDto.getStatus());
+        }
         payment.setStatus(updateDto.getStatus());
 
         return paymentMapper.toDto(payment);

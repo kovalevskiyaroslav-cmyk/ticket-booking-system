@@ -6,7 +6,10 @@ import com.yaroslav.ticket_booking_system.dto.OrderRequestDto;
 import com.yaroslav.ticket_booking_system.dto.OrderResponseDto;
 import com.yaroslav.ticket_booking_system.dto.OrderUpdateDto;
 import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
+import com.yaroslav.ticket_booking_system.exception.DuplicateTicketException;
 import com.yaroslav.ticket_booking_system.exception.EventNotFoundException;
+import com.yaroslav.ticket_booking_system.exception.InvalidOrderStatusTransitionException;
+import com.yaroslav.ticket_booking_system.exception.OrderAlreadyDeletedException;
 import com.yaroslav.ticket_booking_system.exception.OrderNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.SeatNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.TicketNotFoundException;
@@ -66,22 +69,19 @@ public class OrderServiceImpl implements OrderService {
         if (requestDto.getTicketDtos() != null && !requestDto.getTicketDtos().isEmpty()) {
             for (TicketRequestDto ticketDto : requestDto.getTicketDtos()) {
 
+                boolean seatTaken = ticketRepository.existsByEventIdAndSeatId(
+                        ticketDto.getEventId(),
+                        ticketDto.getSeatId()
+                );
+                if (seatTaken) {
+                    throw new DuplicateTicketException(ticketDto.getEventId(), ticketDto.getSeatId());
+                }
+
                 final Event event = eventRepository.findById(ticketDto.getEventId())
                         .orElseThrow(() -> new EventNotFoundException(ticketDto.getEventId()));
 
                 final Seat seat = seatRepository.findById(ticketDto.getSeatId())
                         .orElseThrow(() -> new SeatNotFoundException(ticketDto.getSeatId()));
-
-                final boolean seatTaken = ticketRepository.existsByEventIdAndSeatId(
-                        ticketDto.getEventId(),
-                        ticketDto.getSeatId()
-                );
-
-                if (seatTaken) {
-                    throw new IllegalStateException(
-                            "Seat " + seat.getNumber() + " is already reserved for event: " + event.getName()
-                    );
-                }
 
                 final Ticket ticket = new Ticket();
                 ticket.setEvent(event);
@@ -186,8 +186,15 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto updateOrderById(UUID id, OrderUpdateDto updateDto) {
 
         final Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
+        if (order.isDeleted()) {
+            throw new OrderAlreadyDeletedException(id);
+        }
 
         if (updateDto.getStatus() != null) {
+            if (order.getStatus().cannotTransitionTo(updateDto.getStatus())) {
+                throw new InvalidOrderStatusTransitionException(order.getStatus(), updateDto.getStatus());
+            }
+
             order.setStatus(updateDto.getStatus());
         }
         if (updateDto.getCompletedAt() != null) {
@@ -206,6 +213,9 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto addTicketToOrder(UUID id, TicketRequestDto requestDto) {
 
         final Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
+        if (order.isDeleted()) {
+            throw new OrderAlreadyDeletedException(id);
+        }
 
         final Event event = eventRepository.findById(requestDto.getEventId())
                 .orElseThrow(() -> new EventNotFoundException(requestDto.getEventId()));
@@ -237,6 +247,9 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto removeTicketFromOrder(UUID id, UUID ticketId) {
 
         final Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
+        if (order.isDeleted()) {
+            throw new OrderAlreadyDeletedException(id);
+        }
 
         final Ticket ticket = order.getTickets().stream()
                 .filter(t -> t.getId().equals(ticketId))

@@ -6,9 +6,10 @@ import com.yaroslav.ticket_booking_system.dto.OrderUpdateDto;
 import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
 import com.yaroslav.ticket_booking_system.model.OrderStatus;
 import com.yaroslav.ticket_booking_system.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderRequestDto requestDto) {
+    public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto requestDto) {
 
         final OrderResponseDto created = orderService.createOrder(requestDto);
 
@@ -87,10 +88,7 @@ public class OrderController {
     @GetMapping("/by-venue/{name}")
     public ResponseEntity<Page<OrderResponseDto>> getOrdersByVenueName(
             @PathVariable String name,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        final Pageable pageable = PageRequest.of(page, size);
+            @ParameterObject Pageable pageable) {
 
         return ResponseEntity.ok(orderService.getOrdersByVenueName(name, pageable));
     }
@@ -98,7 +96,7 @@ public class OrderController {
     @PatchMapping("/add/{id}")
     public ResponseEntity<OrderResponseDto> addTicketToOrder(
             @PathVariable UUID id,
-            @RequestBody TicketRequestDto requestDto) {
+            @Valid @RequestBody TicketRequestDto requestDto) {
 
         final OrderResponseDto order = orderService.addTicketToOrder(id, requestDto);
 
@@ -114,7 +112,9 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<OrderResponseDto> updateOrderById(@PathVariable UUID id, @RequestBody OrderUpdateDto updateDto) {
+    public ResponseEntity<OrderResponseDto> updateOrderById(
+            @PathVariable UUID id,
+            @Valid @RequestBody OrderUpdateDto updateDto) {
 
         final OrderResponseDto order = orderService.updateOrderById(id, updateDto);
 

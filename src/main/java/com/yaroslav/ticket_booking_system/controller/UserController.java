@@ -4,6 +4,7 @@ import com.yaroslav.ticket_booking_system.dto.UserRequestDto;
 import com.yaroslav.ticket_booking_system.dto.UserResponseDto;
 import com.yaroslav.ticket_booking_system.dto.UserUpdateDto;
 import com.yaroslav.ticket_booking_system.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto requestDto) {
 
         final UserResponseDto created = userService.createUser(requestDto);
 
@@ -93,7 +94,9 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUserById(@PathVariable UUID id, @RequestBody UserUpdateDto updateDto) {
+    public ResponseEntity<UserResponseDto> updateUserById(
+            @PathVariable UUID id,
+            @Valid @RequestBody UserUpdateDto updateDto) {
 
         final UserResponseDto user = userService.updateUserById(id, updateDto);
 

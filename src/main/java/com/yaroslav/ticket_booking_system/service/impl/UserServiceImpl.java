@@ -6,6 +6,8 @@ import com.yaroslav.ticket_booking_system.dto.UserUpdateDto;
 import com.yaroslav.ticket_booking_system.exception.DuplicateEmailException;
 import com.yaroslav.ticket_booking_system.exception.DuplicatePhoneException;
 import com.yaroslav.ticket_booking_system.exception.EventNotFoundException;
+import com.yaroslav.ticket_booking_system.exception.FavoriteEventAlreadyExistsException;
+import com.yaroslav.ticket_booking_system.exception.FavoriteEventNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.UserNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.UserMapper;
 import com.yaroslav.ticket_booking_system.model.Event;
@@ -100,6 +102,10 @@ public class UserServiceImpl implements UserService {
         final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
 
         final User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        if (user.getFavoriteEvents().contains(event)) {
+            throw new FavoriteEventAlreadyExistsException(eventId);
+        }
+
         user.addFavoriteEvent(event);
 
         return userMapper.toDto(user);
@@ -112,6 +118,10 @@ public class UserServiceImpl implements UserService {
         final Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
 
         final User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        if (!user.getFavoriteEvents().contains(event)) {
+            throw new FavoriteEventNotFoundException(eventId);
+        }
+
         user.removeFavoriteEvent(event);
 
         return userMapper.toDto(user);

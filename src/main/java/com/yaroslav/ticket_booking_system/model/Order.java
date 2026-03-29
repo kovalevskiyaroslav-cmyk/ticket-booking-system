@@ -85,4 +85,8 @@ public class Order extends AbstractAuditableEntity {
         ticket.setOrder(null);
         totalPrice = totalPrice.subtract(ticket.getPrice());
     }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
 }

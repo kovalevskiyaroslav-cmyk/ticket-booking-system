@@ -4,6 +4,7 @@ import com.yaroslav.ticket_booking_system.dto.EventRequestDto;
 import com.yaroslav.ticket_booking_system.dto.EventResponseDto;
 import com.yaroslav.ticket_booking_system.dto.EventUpdateDto;
 import com.yaroslav.ticket_booking_system.service.EventService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    public ResponseEntity<EventResponseDto> createEvent(@RequestBody EventRequestDto requestDto) {
+    public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto requestDto) {
 
         final EventResponseDto created = eventService.createEvent(requestDto);
 
@@ -72,7 +73,7 @@ public class EventController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<EventResponseDto> updateEventById(@PathVariable UUID id, @RequestBody EventUpdateDto updateDto) {
+    public ResponseEntity<EventResponseDto> updateEventById(@PathVariable UUID id, @Valid @RequestBody EventUpdateDto updateDto) {
 
         final EventResponseDto event = eventService.updateById(id, updateDto);
 

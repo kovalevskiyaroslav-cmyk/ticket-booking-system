@@ -19,4 +19,6 @@ public interface SeatRepository extends JpaRepository<Seat, UUID> {
 
     @EntityGraph(attributePaths = {"venue"})
     List<Seat> findByPriceBetween(BigDecimal min, BigDecimal max);
+
+    boolean existsByVenueIdAndSectionAndNumber(UUID venueId, Integer section, Integer number);
 }

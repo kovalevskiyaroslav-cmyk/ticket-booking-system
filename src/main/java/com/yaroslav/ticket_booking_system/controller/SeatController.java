@@ -4,6 +4,7 @@ import com.yaroslav.ticket_booking_system.dto.SeatRequestDto;
 import com.yaroslav.ticket_booking_system.dto.SeatResponseDto;
 import com.yaroslav.ticket_booking_system.dto.SeatUpdateDto;
 import com.yaroslav.ticket_booking_system.service.SeatService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class SeatController {
     private final SeatService seatService;
 
     @PostMapping
-    public ResponseEntity<SeatResponseDto> createSeat(@RequestBody SeatRequestDto requestDto) {
+    public ResponseEntity<SeatResponseDto> createSeat(@Valid @RequestBody SeatRequestDto requestDto) {
 
         final SeatResponseDto created = seatService.createSeat(requestDto);
 
@@ -83,7 +84,9 @@ public class SeatController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<SeatResponseDto> updateSeatById(@PathVariable UUID id, @RequestBody SeatUpdateDto updateDto) {
+    public ResponseEntity<SeatResponseDto> updateSeatById(
+            @PathVariable UUID id,
+            @Valid @RequestBody SeatUpdateDto updateDto) {
 
         final SeatResponseDto seat = seatService.updateSeatById(id, updateDto);
 

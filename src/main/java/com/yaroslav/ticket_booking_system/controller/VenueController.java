@@ -4,6 +4,7 @@ import com.yaroslav.ticket_booking_system.dto.VenueRequestDto;
 import com.yaroslav.ticket_booking_system.dto.VenueResponseDto;
 import com.yaroslav.ticket_booking_system.dto.VenueUpdateDto;
 import com.yaroslav.ticket_booking_system.service.VenueService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class VenueController {
     private final VenueService venueService;
 
     @PostMapping
-    public ResponseEntity<VenueResponseDto> createVenue(@RequestBody VenueRequestDto requestDto) {
+    public ResponseEntity<VenueResponseDto> createVenue(@Valid @RequestBody VenueRequestDto requestDto) {
 
         final VenueResponseDto created = venueService.createVenue(requestDto);
 
@@ -67,7 +68,9 @@ public class VenueController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<VenueResponseDto> updateVenueById(@PathVariable UUID id, @RequestBody VenueUpdateDto updateDto) {
+    public ResponseEntity<VenueResponseDto> updateVenueById(
+            @PathVariable UUID id,
+            @Valid @RequestBody VenueUpdateDto updateDto) {
 
         final VenueResponseDto venue = venueService.updateVenueById(id, updateDto);
 

@@ -3,6 +3,7 @@ package com.yaroslav.ticket_booking_system.service.impl;
 import com.yaroslav.ticket_booking_system.dto.EventRequestDto;
 import com.yaroslav.ticket_booking_system.dto.EventResponseDto;
 import com.yaroslav.ticket_booking_system.dto.EventUpdateDto;
+import com.yaroslav.ticket_booking_system.exception.DuplicateEventNameException;
 import com.yaroslav.ticket_booking_system.exception.EventNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.VenueNotFoundException;
 import com.yaroslav.ticket_booking_system.mapper.EventMapper;
@@ -32,6 +33,9 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventResponseDto createEvent(EventRequestDto requestDto) {
+        if (eventRepository.existsByName(requestDto.getName())) {
+            throw new DuplicateEventNameException(requestDto.getName());
+        }
 
         final Event event = eventMapper.toEntity(requestDto);
 
@@ -89,7 +93,11 @@ public class EventServiceImpl implements EventService {
 
         final Event event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException(id));
 
-        if (updateDto.getName() != null) {
+        if (updateDto.getName() != null && !updateDto.getName().equals(event.getName())) {
+            if (eventRepository.existsByName(updateDto.getName())) {
+                throw new DuplicateEventNameException(updateDto.getName());
+            }
+
             event.setName(updateDto.getName());
         }
         if (updateDto.getDescription() != null) {
