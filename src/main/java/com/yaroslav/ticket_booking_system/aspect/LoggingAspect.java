@@ -15,28 +15,28 @@ import java.util.Arrays;
 public class LoggingAspect {
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service..*.*(..))")
-    public void serviceMethod() {}
+    public void serviceMethod() { }
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service.EventService.*(..))")
-    public void eventServiceMethod() {}
+    public void eventServiceMethod() { }
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service.OrderService.*(..))")
-    public void orderServiceMethod() {}
+    public void orderServiceMethod() { }
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service.PaymentService.*(..))")
-    public void paymentServiceMethod() {}
+    public void paymentServiceMethod() { }
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service.SeatService.*(..))")
-    public void seatServiceMethod() {}
+    public void seatServiceMethod() { }
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service.TicketService.*(..))")
-    public void ticketServiceMethod() {}
+    public void ticketServiceMethod() { }
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service.UserService.*(..))")
-    public void userServiceMethod() {}
+    public void userServiceMethod() { }
 
     @Pointcut("execution(* com.yaroslav.ticket_booking_system.service.VenueService.*(..))")
-    public void venueServiceMethod() {}
+    public void venueServiceMethod() { }
 
     @Around(
             "eventServiceMethod() || " +
@@ -48,9 +48,9 @@ public class LoggingAspect {
                     "venueServiceMethod()"
     )
     public Object logServiceMethods(ProceedingJoinPoint joinPoint) throws Throwable {
-        String className = joinPoint.getTarget().getClass().getSimpleName();
-        String methodName = joinPoint.getSignature().getName();
-        Object[] args = joinPoint.getArgs();
+        final String className = joinPoint.getTarget().getClass().getSimpleName();
+        final String methodName = joinPoint.getSignature().getName();
+        final Object[] args = joinPoint.getArgs();
 
         if (log.isDebugEnabled()) {
             log.debug("Entering {}.{} with arguments: {}", className, methodName, Arrays.toString(args));
@@ -58,13 +58,13 @@ public class LoggingAspect {
             log.info("Entering {}.{}", className, methodName);
         }
 
-        long startTime = System.nanoTime();
-        Object result;
+        final long startTime = System.nanoTime();
+        final Object result;
 
         try {
             result = joinPoint.proceed();
 
-            long executionTimeMs = (System.nanoTime() - startTime) / 1_000_000;
+            final long executionTimeMs = (System.nanoTime() - startTime) / 1_000_000;
 
             if (executionTimeMs > 1000) {
                 log.warn("{}.{} executed in {} ms (slow)", className, methodName, executionTimeMs);

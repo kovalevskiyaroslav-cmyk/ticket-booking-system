@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
         if (requestDto.getTicketDtos() != null && !requestDto.getTicketDtos().isEmpty()) {
             for (TicketRequestDto ticketDto : requestDto.getTicketDtos()) {
 
-                boolean seatTaken = ticketRepository.existsByEventIdAndSeatId(
+                final boolean seatTaken = ticketRepository.existsByEventIdAndSeatId(
                         ticketDto.getEventId(),
                         ticketDto.getSeatId()
                 );

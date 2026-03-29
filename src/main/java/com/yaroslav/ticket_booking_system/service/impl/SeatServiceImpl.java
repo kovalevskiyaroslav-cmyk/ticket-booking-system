@@ -37,7 +37,7 @@ public class SeatServiceImpl implements SeatService {
         final Venue venue = venueRepository.findById(requestDto.getVenueId())
                 .orElseThrow(() -> new VenueNotFoundException(requestDto.getVenueId()));
 
-        boolean seatExists = seatRepository.existsByVenueIdAndSectionAndNumber(
+        final boolean seatExists = seatRepository.existsByVenueIdAndSectionAndNumber(
                 requestDto.getVenueId(),
                 requestDto.getSection(),
                 requestDto.getNumber()

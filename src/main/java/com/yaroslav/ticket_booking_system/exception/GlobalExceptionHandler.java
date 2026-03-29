@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(VenueNotFoundException.class)
     public ProblemDetail handleVenueNotFound(VenueNotFoundException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TicketNotFoundException.class)
     public ProblemDetail handleTicketNotFound(TicketNotFoundException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SeatNotFoundException.class)
     public ProblemDetail handleSeatNotFound(SeatNotFoundException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PaymentNotFoundException.class)
     public ProblemDetail handlePaymentNotFound(PaymentNotFoundException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OrderNotFoundException.class)
     public ProblemDetail handleOrderNotFound(OrderNotFoundException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EventNotFoundException.class)
     public ProblemDetail handleEventNotFound(EventNotFoundException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateEmailException.class)
     public ProblemDetail handleDuplicateEmail(DuplicateEmailException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -109,7 +109,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicatePhoneException.class)
     public ProblemDetail handleDuplicatePhone(DuplicatePhoneException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidOrderStatusTransitionException.class)
     public ProblemDetail handleInvalidOrderStatusTransition(InvalidOrderStatusTransitionException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
@@ -133,7 +133,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OrderAlreadyDeletedException.class)
     public ProblemDetail handleOrderAlreadyDeleted(OrderAlreadyDeletedException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -145,7 +145,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ProblemDetail handleIllegalState(IllegalStateException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -157,7 +157,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateEventNameException.class)
     public ProblemDetail handleDuplicateEventName(DuplicateEventNameException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -169,7 +169,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidPaymentStatusTransitionException.class)
     public ProblemDetail handleInvalidPaymentStatusTransition(InvalidPaymentStatusTransitionException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
@@ -181,7 +181,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({FavoriteEventAlreadyExistsException.class, FavoriteEventNotFoundException.class})
     public ProblemDetail handleFavoriteEventExceptions(RuntimeException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
@@ -193,7 +193,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({DuplicateVenueNameException.class, DuplicateVenueAddressException.class})
     public ProblemDetail handleDuplicateVenueExceptions(RuntimeException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -205,7 +205,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateTicketException.class)
     public ProblemDetail handleDuplicateTicket(DuplicateTicketException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -217,7 +217,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateSeatException.class)
     public ProblemDetail handleDuplicateSeat(DuplicateSeatException ex) {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
         );
@@ -229,7 +229,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException() {
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred"
         );
