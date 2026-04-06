@@ -37,6 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,10 +58,7 @@ public class OrderServiceImpl implements OrderService {
     public static final String ORDERS_BY_VENUE = "getOrdersByVenue";
     public static final String CACHE_HIT = "[CACHE HIT] ";
 
-    @Override
-    @Transactional
-    public OrderResponseDto createOrder(OrderRequestDto requestDto) {
-
+    private OrderResponseDto createSingleOrder(OrderRequestDto requestDto) {
         final User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException(requestDto.getUserId()));
 
@@ -95,15 +94,38 @@ public class OrderServiceImpl implements OrderService {
         }
 
         final Payment payment = new Payment();
-        payment.setAmount(order.getTotalPrice());
+        payment.setAmount(savedOrder.getTotalPrice());
         payment.setStatus(PaymentStatus.PENDING);
-        order.setPayment(payment);
+        savedOrder.setPayment(payment);
 
-        final OrderResponseDto createdOrder = orderMapper.toDto(orderRepository.save(savedOrder));
+        return orderMapper.toDto(orderRepository.save(savedOrder));
+    }
+
+    @Override
+    @Transactional
+    public OrderResponseDto createOrder(OrderRequestDto requestDto) {
+        final OrderResponseDto createdOrder = createSingleOrder(requestDto);
+        cacheService.evictByPattern(ORDERS_BY_VENUE);
+        return createdOrder;
+    }
+
+    @Override
+    @Transactional
+    public List<OrderResponseDto> createOrdersBulk(List<OrderRequestDto> requestDtos) {
+        if (requestDtos == null || requestDtos.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<OrderResponseDto> responses = new ArrayList<>();
+
+        for (OrderRequestDto requestDto : requestDtos) {
+            OrderResponseDto createdOrder = createSingleOrder(requestDto);
+            responses.add(createdOrder);
+        }
 
         cacheService.evictByPattern(ORDERS_BY_VENUE);
 
-        return createdOrder;
+        return responses;
     }
 
     @Override

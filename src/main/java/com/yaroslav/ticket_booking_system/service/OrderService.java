@@ -15,6 +15,8 @@ import java.util.UUID;
 public interface OrderService {
     OrderResponseDto createOrder(OrderRequestDto requestDto);
 
+    List<OrderResponseDto> createOrdersBulk(List<OrderRequestDto> requestDtos);
+
     OrderResponseDto getOrderById(UUID id);
 
     List<OrderResponseDto> getOrdersByStatus(OrderStatus orderStatus);

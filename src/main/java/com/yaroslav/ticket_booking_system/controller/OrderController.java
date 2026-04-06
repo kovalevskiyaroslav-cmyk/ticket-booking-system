@@ -47,6 +47,16 @@ public class OrderController {
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
+    @PostMapping("/bulk")
+    @Operation(summary = "Create multiple orders", description = "Creates multiple orders in a single bulk operation")
+    public ResponseEntity<List<OrderResponseDto>> createOrdersBulk(
+            @Valid @RequestBody List<OrderRequestDto> requestDtos) {
+
+        final List<OrderResponseDto> created = orderService.createOrdersBulk(requestDtos);
+
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get order by ID", description = "Retrieves detailed information about a specific order")
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable UUID id) {
