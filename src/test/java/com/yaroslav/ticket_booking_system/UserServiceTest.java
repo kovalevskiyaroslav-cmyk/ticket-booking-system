@@ -57,7 +57,7 @@ class UserServiceTest {
     }
 
     private User sampleUser() {
-        User user = new User();
+        final User user = new User();
         user.setId(sampleUserId());
         user.setName("Alice Johnson");
         user.setEmail("alice.johnson@example.com");
@@ -67,14 +67,14 @@ class UserServiceTest {
     }
 
     private Event sampleEvent() {
-        Event event = new Event();
+        final Event event = new Event();
         event.setId(sampleEventId());
         event.setName("Legends of Rock Live");
         return event;
     }
 
     private UserRequestDto sampleRequestDto() {
-        UserRequestDto dto = new UserRequestDto();
+        final UserRequestDto dto = new UserRequestDto();
         dto.setName("Alice Johnson");
         dto.setEmail("alice.johnson@example.com");
         dto.setPhone("+12125550123");
@@ -82,7 +82,7 @@ class UserServiceTest {
     }
 
     private UserResponseDto sampleResponseDto() {
-        UserResponseDto dto = new UserResponseDto();
+        final UserResponseDto dto = new UserResponseDto();
         dto.setId(sampleUserId());
         dto.setName("Alice Johnson");
         dto.setEmail("alice.johnson@example.com");
@@ -94,9 +94,9 @@ class UserServiceTest {
 
     @Test
     void createUserSuccess() {
-        UserRequestDto request = sampleRequestDto();
-        User user = sampleUser();
-        UserResponseDto response = sampleResponseDto();
+        final UserRequestDto request = sampleRequestDto();
+        final User user = sampleUser();
+        final UserResponseDto response = sampleResponseDto();
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
         when(userRepository.findByPhone(request.getPhone())).thenReturn(Optional.empty());
@@ -104,7 +104,7 @@ class UserServiceTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.createUser(request);
+        final UserResponseDto result = userService.createUser(request);
 
         assertThat(result).isEqualTo(response);
         verify(userRepository).save(user);
@@ -112,8 +112,8 @@ class UserServiceTest {
 
     @Test
     void createUserDuplicateEmail() {
-        UserRequestDto request = sampleRequestDto();
-        User existingUser = sampleUser();
+        final UserRequestDto request = sampleRequestDto();
+        final User existingUser = sampleUser();
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(existingUser));
 
@@ -125,8 +125,8 @@ class UserServiceTest {
 
     @Test
     void createUserDuplicatePhone() {
-        UserRequestDto request = sampleRequestDto();
-        User existingUser = sampleUser();
+        final UserRequestDto request = sampleRequestDto();
+        final User existingUser = sampleUser();
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
         when(userRepository.findByPhone(request.getPhone())).thenReturn(Optional.of(existingUser));
@@ -139,34 +139,36 @@ class UserServiceTest {
 
     @Test
     void getUserByIdSuccess() {
-        User user = sampleUser();
-        UserResponseDto response = sampleResponseDto();
+        final User user = sampleUser();
+        final UserResponseDto response = sampleResponseDto();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.getUserById(sampleUserId());
+        final UserResponseDto result = userService.getUserById(sampleUserId());
 
         assertThat(result).isEqualTo(response);
     }
 
     @Test
     void getUserByIdNotFound() {
+        final UUID userId = sampleUserId();
+
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.getUserById(sampleUserId()))
+        assertThatThrownBy(() -> userService.getUserById(userId))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test
     void getUserByNameSuccess() {
-        User user = sampleUser();
-        UserResponseDto response = sampleResponseDto();
+        final User user = sampleUser();
+        final UserResponseDto response = sampleResponseDto();
 
         when(userRepository.findByName("Alice Johnson")).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.getUserByName("Alice Johnson");
+        final UserResponseDto result = userService.getUserByName("Alice Johnson");
 
         assertThat(result).isEqualTo(response);
     }
@@ -181,13 +183,13 @@ class UserServiceTest {
 
     @Test
     void getUserByPhoneSuccess() {
-        User user = sampleUser();
-        UserResponseDto response = sampleResponseDto();
+        final User user = sampleUser();
+        final UserResponseDto response = sampleResponseDto();
 
         when(userRepository.findByPhone("+12125550123")).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.getUserByPhone("+12125550123");
+        final UserResponseDto result = userService.getUserByPhone("+12125550123");
 
         assertThat(result).isEqualTo(response);
     }
@@ -202,13 +204,13 @@ class UserServiceTest {
 
     @Test
     void getUserByEmailSuccess() {
-        User user = sampleUser();
-        UserResponseDto response = sampleResponseDto();
+        final User user = sampleUser();
+        final UserResponseDto response = sampleResponseDto();
 
         when(userRepository.findByEmail("alice.johnson@example.com")).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.getUserByEmail("alice.johnson@example.com");
+        final UserResponseDto result = userService.getUserByEmail("alice.johnson@example.com");
 
         assertThat(result).isEqualTo(response);
     }
@@ -223,17 +225,17 @@ class UserServiceTest {
 
     @Test
     void getAllUsersSuccess() {
-        User user1 = sampleUser();
-        User user2 = new User();
+        final User user1 = sampleUser();
+        final User user2 = new User();
         user2.setId(UUID.randomUUID());
         user2.setName("Bob Miller");
         user2.setEmail("bob@example.com");
         user2.setPhone("+12125550789");
 
-        List<User> users = List.of(user1, user2);
+        final List<User> users = List.of(user1, user2);
 
-        UserResponseDto response1 = sampleResponseDto();
-        UserResponseDto response2 = new UserResponseDto();
+        final UserResponseDto response1 = sampleResponseDto();
+        final UserResponseDto response2 = new UserResponseDto();
         response2.setId(user2.getId());
         response2.setName("Bob Miller");
         response2.setEmail("bob@example.com");
@@ -243,7 +245,7 @@ class UserServiceTest {
         when(userMapper.toDto(user1)).thenReturn(response1);
         when(userMapper.toDto(user2)).thenReturn(response2);
 
-        List<UserResponseDto> result = userService.getAllUsers();
+        final List<UserResponseDto> result = userService.getAllUsers();
 
         assertThat(result).hasSize(2);
     }
@@ -252,22 +254,22 @@ class UserServiceTest {
     void getAllUsersEmpty() {
         when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
-        List<UserResponseDto> result = userService.getAllUsers();
+        final List<UserResponseDto> result = userService.getAllUsers();
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void addFavoriteEventToUserSuccess() {
-        User user = sampleUser();
-        Event event = sampleEvent();
-        UserResponseDto response = sampleResponseDto();
+        final User user = sampleUser();
+        final Event event = sampleEvent();
+        final UserResponseDto response = sampleResponseDto();
 
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.addFavoriteEventToUser(sampleUserId(), sampleEventId());
+        final UserResponseDto result = userService.addFavoriteEventToUser(sampleUserId(), sampleEventId());
 
         assertThat(result).isEqualTo(response);
         assertThat(user.getFavoriteEvents()).contains(event);
@@ -275,48 +277,55 @@ class UserServiceTest {
 
     @Test
     void addFavoriteEventToUserEventNotFound() {
+        final UUID userId = sampleUserId();
+        final UUID eventId = sampleUserId();
+
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.addFavoriteEventToUser(sampleUserId(), sampleEventId()))
+        assertThatThrownBy(() -> userService.addFavoriteEventToUser(userId, eventId))
                 .isInstanceOf(EventNotFoundException.class);
     }
 
     @Test
     void addFavoriteEventToUserNotFound() {
-        Event event = sampleEvent();
+        final Event event = sampleEvent();
+        final UUID userId = sampleUserId();
+        final UUID eventId = sampleEventId();
 
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.addFavoriteEventToUser(sampleUserId(), sampleEventId()))
+        assertThatThrownBy(() -> userService.addFavoriteEventToUser(userId, eventId))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test
     void addFavoriteEventToUserAlreadyExists() {
-        User user = sampleUser();
-        Event event = sampleEvent();
+        final User user = sampleUser();
+        final Event event = sampleEvent();
         user.getFavoriteEvents().add(event);
+        final UUID userId = sampleUserId();
+        final UUID eventId = sampleEventId();
 
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
 
-        assertThatThrownBy(() -> userService.addFavoriteEventToUser(sampleUserId(), sampleEventId()))
+        assertThatThrownBy(() -> userService.addFavoriteEventToUser(userId, eventId))
                 .isInstanceOf(FavoriteEventAlreadyExistsException.class);
     }
 
     @Test
     void removeFavoriteEventFromUserSuccess() {
-        User user = sampleUser();
-        Event event = sampleEvent();
+        final User user = sampleUser();
+        final Event event = sampleEvent();
         user.getFavoriteEvents().add(event);
-        UserResponseDto response = sampleResponseDto();
+        final UserResponseDto response = sampleResponseDto();
 
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.removeFavoriteEventFromUser(sampleUserId(), sampleEventId());
+        final UserResponseDto result = userService.removeFavoriteEventFromUser(sampleUserId(), sampleEventId());
 
         assertThat(result).isEqualTo(response);
         assertThat(user.getFavoriteEvents()).doesNotContain(event);
@@ -324,44 +333,51 @@ class UserServiceTest {
 
     @Test
     void removeFavoriteEventFromUserEventNotFound() {
+        final UUID userId = sampleUserId();
+        final UUID eventId = sampleUserId();
+
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.removeFavoriteEventFromUser(sampleUserId(), sampleEventId()))
+        assertThatThrownBy(() -> userService.removeFavoriteEventFromUser(userId, eventId))
                 .isInstanceOf(EventNotFoundException.class);
     }
 
     @Test
     void removeFavoriteEventFromUserNotFound() {
-        Event event = sampleEvent();
+        final Event event = sampleEvent();
+        final UUID userId = sampleUserId();
+        final UUID eventId = sampleEventId();
 
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.removeFavoriteEventFromUser(sampleUserId(), sampleEventId()))
+        assertThatThrownBy(() -> userService.removeFavoriteEventFromUser(userId, eventId))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test
     void removeFavoriteEventFromUserNotExists() {
-        User user = sampleUser();
-        Event event = sampleEvent();
+        final User user = sampleUser();
+        final Event event = sampleEvent();
+        final UUID userId = sampleUserId();
+        final UUID eventId = sampleEventId();
 
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
 
-        assertThatThrownBy(() -> userService.removeFavoriteEventFromUser(sampleUserId(), sampleEventId()))
+        assertThatThrownBy(() -> userService.removeFavoriteEventFromUser(userId, eventId))
                 .isInstanceOf(FavoriteEventNotFoundException.class);
     }
 
     @Test
     void updateUserByIdSuccess() {
-        UserUpdateDto updateDto = new UserUpdateDto();
+        final UserUpdateDto updateDto = new UserUpdateDto();
         updateDto.setName("Alice Updated");
         updateDto.setEmail("alice.updated@example.com");
         updateDto.setPhone("+12125550999");
 
-        User user = sampleUser();
-        UserResponseDto response = sampleResponseDto();
+        final User user = sampleUser();
+        final UserResponseDto response = sampleResponseDto();
         response.setName("Alice Updated");
         response.setEmail("alice.updated@example.com");
         response.setPhone("+12125550999");
@@ -371,7 +387,7 @@ class UserServiceTest {
         when(userRepository.findByPhone("+12125550999")).thenReturn(Optional.empty());
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.updateUserById(sampleUserId(), updateDto);
+        final UserResponseDto result = userService.updateUserById(sampleUserId(), updateDto);
 
         assertThat(result.getName()).isEqualTo("Alice Updated");
         assertThat(result.getEmail()).isEqualTo("alice.updated@example.com");
@@ -380,17 +396,17 @@ class UserServiceTest {
 
     @Test
     void updateUserByIdPartialUpdate() {
-        UserUpdateDto updateDto = new UserUpdateDto();
+        final UserUpdateDto updateDto = new UserUpdateDto();
         updateDto.setName("Alice Updated Only");
 
-        User user = sampleUser();
-        UserResponseDto response = sampleResponseDto();
+        final User user = sampleUser();
+        final UserResponseDto response = sampleResponseDto();
         response.setName("Alice Updated Only");
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(response);
 
-        UserResponseDto result = userService.updateUserById(sampleUserId(), updateDto);
+        final UserResponseDto result = userService.updateUserById(sampleUserId(), updateDto);
 
         assertThat(result.getName()).isEqualTo("Alice Updated Only");
         assertThat(result.getEmail()).isEqualTo("alice.johnson@example.com");
@@ -399,56 +415,59 @@ class UserServiceTest {
 
     @Test
     void updateUserByIdNotFound() {
-        UserUpdateDto updateDto = new UserUpdateDto();
+        final UserUpdateDto updateDto = new UserUpdateDto();
         updateDto.setName("Updated Name");
+        final UUID userId = sampleUserId();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.updateUserById(sampleUserId(), updateDto))
+        assertThatThrownBy(() -> userService.updateUserById(userId, updateDto))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test
     void updateUserByIdDuplicateEmail() {
-        UserUpdateDto updateDto = new UserUpdateDto();
+        final UserUpdateDto updateDto = new UserUpdateDto();
         updateDto.setEmail("existing@example.com");
 
-        User user = sampleUser();
-        User existingUser = new User();
+        final User user = sampleUser();
+        final User existingUser = new User();
         existingUser.setId(UUID.randomUUID());
         existingUser.setEmail("existing@example.com");
+        final UUID userId = sampleUserId();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(userRepository.findByEmail("existing@example.com")).thenReturn(Optional.of(existingUser));
 
-        assertThatThrownBy(() -> userService.updateUserById(sampleUserId(), updateDto))
+        assertThatThrownBy(() -> userService.updateUserById(userId, updateDto))
                 .isInstanceOf(DuplicateEmailException.class);
     }
 
     @Test
     void updateUserByIdDuplicatePhone() {
-        UserUpdateDto updateDto = new UserUpdateDto();
+        final UserUpdateDto updateDto = new UserUpdateDto();
         updateDto.setPhone("+12125550999");
 
-        User user = sampleUser();
-        User existingUser = new User();
+        final User user = sampleUser();
+        final User existingUser = new User();
         existingUser.setId(UUID.randomUUID());
         existingUser.setPhone("+12125550999");
+        final UUID userId = sampleUserId();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(userRepository.findByPhone("+12125550999")).thenReturn(Optional.of(existingUser));
 
-        assertThatThrownBy(() -> userService.updateUserById(sampleUserId(), updateDto))
+        assertThatThrownBy(() -> userService.updateUserById(userId, updateDto))
                 .isInstanceOf(DuplicatePhoneException.class);
     }
 
     @Test
     void updateUserByIdSameEmailDifferentUser() {
-        UserUpdateDto updateDto = new UserUpdateDto();
+        final UserUpdateDto updateDto = new UserUpdateDto();
         updateDto.setEmail("alice.johnson@example.com");
 
-        User user = sampleUser();
-        User existingUser = new User();
+        final User user = sampleUser();
+        final User existingUser = new User();
         existingUser.setId(sampleUserId());
         existingUser.setEmail("alice.johnson@example.com");
 
@@ -456,14 +475,14 @@ class UserServiceTest {
         when(userRepository.findByEmail("alice.johnson@example.com")).thenReturn(Optional.of(existingUser));
         when(userMapper.toDto(user)).thenReturn(sampleResponseDto());
 
-        UserResponseDto result = userService.updateUserById(sampleUserId(), updateDto);
+        final UserResponseDto result = userService.updateUserById(sampleUserId(), updateDto);
 
         assertThat(result).isNotNull();
     }
 
     @Test
     void deleteUserByIdSuccess() {
-        User user = sampleUser();
+        final User user = sampleUser();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
 
@@ -474,9 +493,11 @@ class UserServiceTest {
 
     @Test
     void deleteUserByIdNotFound() {
+        final UUID userId = sampleUserId();
+
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.deleteUserById(sampleUserId()))
+        assertThatThrownBy(() -> userService.deleteUserById(userId))
                 .isInstanceOf(UserNotFoundException.class);
     }
 }

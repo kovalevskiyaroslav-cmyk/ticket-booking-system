@@ -42,7 +42,7 @@ class PaymentServiceTest {
     }
 
     private Payment samplePayment() {
-        Payment payment = new Payment();
+        final Payment payment = new Payment();
         payment.setId(samplePaymentId());
         payment.setStatus(PaymentStatus.PENDING);
         payment.setAmount(new BigDecimal("89.99"));
@@ -50,7 +50,7 @@ class PaymentServiceTest {
     }
 
     private PaymentResponseDto samplePaymentResponseDto() {
-        PaymentResponseDto dto = new PaymentResponseDto();
+        final PaymentResponseDto dto = new PaymentResponseDto();
         dto.setId(samplePaymentId());
         dto.setStatus(PaymentStatus.PENDING);
         dto.setAmount(new BigDecimal("89.99"));
@@ -59,13 +59,13 @@ class PaymentServiceTest {
 
     @Test
     void getPaymentByIdSuccess() {
-        Payment payment = samplePayment();
-        PaymentResponseDto response = samplePaymentResponseDto();
+        final Payment payment = samplePayment();
+        final PaymentResponseDto response = samplePaymentResponseDto();
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
         when(paymentMapper.toDto(payment)).thenReturn(response);
 
-        PaymentResponseDto result = paymentService.getPaymentById(samplePaymentId());
+        final PaymentResponseDto result = paymentService.getPaymentById(samplePaymentId());
 
         assertThat(result).isEqualTo(response);
         assertThat(result.getId()).isEqualTo(samplePaymentId());
@@ -75,51 +75,52 @@ class PaymentServiceTest {
 
     @Test
     void getPaymentByIdNotFound() {
+        final UUID paymentId = samplePaymentId();
+
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> paymentService.getPaymentById(samplePaymentId()))
+        assertThatThrownBy(() -> paymentService.getPaymentById(paymentId))
                 .isInstanceOf(PaymentNotFoundException.class);
     }
 
     @Test
     void getPaymentsByAmountBetweenSuccess() {
-        BigDecimal min = new BigDecimal("50.00");
-        BigDecimal max = new BigDecimal("150.00");
+        final BigDecimal min = new BigDecimal("50.00");
+        final BigDecimal max = new BigDecimal("150.00");
 
-        Payment payment1 = samplePayment();
-        Payment payment2 = new Payment();
+        final Payment payment1 = samplePayment();
+        final Payment payment2 = new Payment();
         payment2.setId(UUID.randomUUID());
         payment2.setStatus(PaymentStatus.COMPLETED);
         payment2.setAmount(new BigDecimal("120.00"));
 
-        List<Payment> payments = List.of(payment1, payment2);
+        final List<Payment> payments = List.of(payment1, payment2);
 
-        PaymentResponseDto response1 = samplePaymentResponseDto();
-        PaymentResponseDto response2 = new PaymentResponseDto();
+        final PaymentResponseDto response1 = samplePaymentResponseDto();
+        final PaymentResponseDto response2 = new PaymentResponseDto();
         response2.setId(payment2.getId());
         response2.setStatus(PaymentStatus.COMPLETED);
         response2.setAmount(new BigDecimal("120.00"));
 
-        List<PaymentResponseDto> expectedResponses = List.of(response1, response2);
+        final List<PaymentResponseDto> expectedResponses = List.of(response1, response2);
 
         when(paymentRepository.findByAmountBetween(min, max)).thenReturn(payments);
         when(paymentMapper.toDto(payment1)).thenReturn(response1);
         when(paymentMapper.toDto(payment2)).thenReturn(response2);
 
-        List<PaymentResponseDto> result = paymentService.getPaymentsByAmountBetween(min, max);
+        final List<PaymentResponseDto> result = paymentService.getPaymentsByAmountBetween(min, max);
 
-        assertThat(result).hasSize(2);
-        assertThat(result).isEqualTo(expectedResponses);
+        assertThat(result).hasSize(2).isEqualTo(expectedResponses);
     }
 
     @Test
     void getPaymentsByAmountBetweenEmpty() {
-        BigDecimal min = new BigDecimal("500.00");
-        BigDecimal max = new BigDecimal("1000.00");
+        final BigDecimal min = new BigDecimal("500.00");
+        final BigDecimal max = new BigDecimal("1000.00");
 
         when(paymentRepository.findByAmountBetween(min, max)).thenReturn(Collections.emptyList());
 
-        List<PaymentResponseDto> result = paymentService.getPaymentsByAmountBetween(min, max);
+        final List<PaymentResponseDto> result = paymentService.getPaymentsByAmountBetween(min, max);
 
         assertThat(result).isEmpty();
     }
@@ -129,37 +130,36 @@ class PaymentServiceTest {
 
         when(paymentRepository.findByAmountBetween(null, null)).thenReturn(Collections.emptyList());
 
-        List<PaymentResponseDto> result = paymentService.getPaymentsByAmountBetween(null, null);
+        final List<PaymentResponseDto> result = paymentService.getPaymentsByAmountBetween(null, null);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void getPaymentsByStatusSuccess() {
-        Payment payment1 = samplePayment();
-        Payment payment2 = new Payment();
+        final Payment payment1 = samplePayment();
+        final Payment payment2 = new Payment();
         payment2.setId(UUID.randomUUID());
         payment2.setStatus(PaymentStatus.PENDING);
         payment2.setAmount(new BigDecimal("255.00"));
 
-        List<Payment> payments = List.of(payment1, payment2);
+        final List<Payment> payments = List.of(payment1, payment2);
 
-        PaymentResponseDto response1 = samplePaymentResponseDto();
-        PaymentResponseDto response2 = new PaymentResponseDto();
+        final PaymentResponseDto response1 = samplePaymentResponseDto();
+        final PaymentResponseDto response2 = new PaymentResponseDto();
         response2.setId(payment2.getId());
         response2.setStatus(PaymentStatus.PENDING);
         response2.setAmount(new BigDecimal("255.00"));
 
-        List<PaymentResponseDto> expectedResponses = List.of(response1, response2);
+        final List<PaymentResponseDto> expectedResponses = List.of(response1, response2);
 
         when(paymentRepository.findByStatus(PaymentStatus.PENDING)).thenReturn(payments);
         when(paymentMapper.toDto(payment1)).thenReturn(response1);
         when(paymentMapper.toDto(payment2)).thenReturn(response2);
 
-        List<PaymentResponseDto> result = paymentService.getPaymentsByStatus(PaymentStatus.PENDING);
+        final List<PaymentResponseDto> result = paymentService.getPaymentsByStatus(PaymentStatus.PENDING);
 
-        assertThat(result).hasSize(2);
-        assertThat(result).isEqualTo(expectedResponses);
+        assertThat(result).hasSize(2).isEqualTo(expectedResponses);
         assertThat(result.get(0).getStatus()).isEqualTo(PaymentStatus.PENDING);
         assertThat(result.get(1).getStatus()).isEqualTo(PaymentStatus.PENDING);
     }
@@ -168,61 +168,60 @@ class PaymentServiceTest {
     void getPaymentsByStatusEmpty() {
         when(paymentRepository.findByStatus(PaymentStatus.FAILED)).thenReturn(Collections.emptyList());
 
-        List<PaymentResponseDto> result = paymentService.getPaymentsByStatus(PaymentStatus.FAILED);
+        final List<PaymentResponseDto> result = paymentService.getPaymentsByStatus(PaymentStatus.FAILED);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void getAllPaymentsSuccess() {
-        Payment payment1 = samplePayment();
-        Payment payment2 = new Payment();
+        final Payment payment1 = samplePayment();
+        final Payment payment2 = new Payment();
         payment2.setId(UUID.randomUUID());
         payment2.setStatus(PaymentStatus.COMPLETED);
         payment2.setAmount(new BigDecimal("120.00"));
 
-        List<Payment> payments = List.of(payment1, payment2);
+        final List<Payment> payments = List.of(payment1, payment2);
 
-        PaymentResponseDto response1 = samplePaymentResponseDto();
-        PaymentResponseDto response2 = new PaymentResponseDto();
+        final PaymentResponseDto response1 = samplePaymentResponseDto();
+        final PaymentResponseDto response2 = new PaymentResponseDto();
         response2.setId(payment2.getId());
         response2.setStatus(PaymentStatus.COMPLETED);
         response2.setAmount(new BigDecimal("120.00"));
 
-        List<PaymentResponseDto> expectedResponses = List.of(response1, response2);
+        final List<PaymentResponseDto> expectedResponses = List.of(response1, response2);
 
         when(paymentRepository.findAll()).thenReturn(payments);
         when(paymentMapper.toDto(payment1)).thenReturn(response1);
         when(paymentMapper.toDto(payment2)).thenReturn(response2);
 
-        List<PaymentResponseDto> result = paymentService.getAllPayments();
+        final List<PaymentResponseDto> result = paymentService.getAllPayments();
 
-        assertThat(result).hasSize(2);
-        assertThat(result).isEqualTo(expectedResponses);
+        assertThat(result).hasSize(2).isEqualTo(expectedResponses);
     }
 
     @Test
     void getAllPaymentsEmpty() {
         when(paymentRepository.findAll()).thenReturn(Collections.emptyList());
 
-        List<PaymentResponseDto> result = paymentService.getAllPayments();
+        final List<PaymentResponseDto> result = paymentService.getAllPayments();
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void updatePaymentByIdSuccess() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.COMPLETED);
 
-        Payment payment = samplePayment();
-        PaymentResponseDto response = samplePaymentResponseDto();
+        final Payment payment = samplePayment();
+        final PaymentResponseDto response = samplePaymentResponseDto();
         response.setStatus(PaymentStatus.COMPLETED);
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
         when(paymentMapper.toDto(payment)).thenReturn(response);
 
-        PaymentResponseDto result = paymentService.updatePaymentById(samplePaymentId(), updateDto);
+        final PaymentResponseDto result = paymentService.updatePaymentById(samplePaymentId(), updateDto);
 
         assertThat(result.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
         assertThat(payment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
@@ -230,128 +229,136 @@ class PaymentServiceTest {
 
     @Test
     void updatePaymentByIdFromPendingToCompleted() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.COMPLETED);
 
-        Payment payment = samplePayment();
+        final Payment payment = samplePayment();
         payment.setStatus(PaymentStatus.PENDING);
 
-        PaymentResponseDto response = samplePaymentResponseDto();
+        final PaymentResponseDto response = samplePaymentResponseDto();
         response.setStatus(PaymentStatus.COMPLETED);
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
         when(paymentMapper.toDto(payment)).thenReturn(response);
 
-        PaymentResponseDto result = paymentService.updatePaymentById(samplePaymentId(), updateDto);
+        final PaymentResponseDto result = paymentService.updatePaymentById(samplePaymentId(), updateDto);
 
         assertThat(result.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
     }
 
     @Test
     void updatePaymentByIdFromPendingToFailed() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.FAILED);
 
-        Payment payment = samplePayment();
+        final Payment payment = samplePayment();
         payment.setStatus(PaymentStatus.PENDING);
 
-        PaymentResponseDto response = samplePaymentResponseDto();
+        final PaymentResponseDto response = samplePaymentResponseDto();
         response.setStatus(PaymentStatus.FAILED);
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
         when(paymentMapper.toDto(payment)).thenReturn(response);
 
-        PaymentResponseDto result = paymentService.updatePaymentById(samplePaymentId(), updateDto);
+        final PaymentResponseDto result = paymentService.updatePaymentById(samplePaymentId(), updateDto);
 
         assertThat(result.getStatus()).isEqualTo(PaymentStatus.FAILED);
     }
 
     @Test
     void updatePaymentByIdInvalidTransitionFromCompletedToPending() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.PENDING);
 
-        Payment payment = samplePayment();
+        final Payment payment = samplePayment();
         payment.setStatus(PaymentStatus.COMPLETED);
+        final UUID paymentId = samplePaymentId();
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
 
-        assertThatThrownBy(() -> paymentService.updatePaymentById(samplePaymentId(), updateDto))
+        assertThatThrownBy(() -> paymentService.updatePaymentById(paymentId, updateDto))
                 .isInstanceOf(InvalidPaymentStatusTransitionException.class);
     }
 
     @Test
     void updatePaymentByIdInvalidTransitionFromCompletedToFailed() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.FAILED);
 
-        Payment payment = samplePayment();
+        final Payment payment = samplePayment();
         payment.setStatus(PaymentStatus.COMPLETED);
+        final UUID paymentId = samplePaymentId();
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
 
-        assertThatThrownBy(() -> paymentService.updatePaymentById(samplePaymentId(), updateDto))
+        assertThatThrownBy(() -> paymentService.updatePaymentById(paymentId, updateDto))
                 .isInstanceOf(InvalidPaymentStatusTransitionException.class);
     }
 
     @Test
     void updatePaymentByIdInvalidTransitionFromFailedToCompleted() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.COMPLETED);
 
-        Payment payment = samplePayment();
+        final Payment payment = samplePayment();
         payment.setStatus(PaymentStatus.FAILED);
+        final UUID paymentId = samplePaymentId();
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
 
-        assertThatThrownBy(() -> paymentService.updatePaymentById(samplePaymentId(), updateDto))
+        assertThatThrownBy(() -> paymentService.updatePaymentById(paymentId, updateDto))
                 .isInstanceOf(InvalidPaymentStatusTransitionException.class);
     }
 
     @Test
     void updatePaymentByIdInvalidTransitionFromFailedToPending() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.PENDING);
 
-        Payment payment = samplePayment();
+        final Payment payment = samplePayment();
         payment.setStatus(PaymentStatus.FAILED);
+        final UUID paymentId = samplePaymentId();
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
 
-        assertThatThrownBy(() -> paymentService.updatePaymentById(samplePaymentId(), updateDto))
+        assertThatThrownBy(() -> paymentService.updatePaymentById(paymentId, updateDto))
                 .isInstanceOf(InvalidPaymentStatusTransitionException.class);
     }
 
     @Test
     void updatePaymentByIdSameStatus() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.PENDING);
 
-        Payment payment = samplePayment();
+        final Payment payment = samplePayment();
         payment.setStatus(PaymentStatus.PENDING);
+        final UUID paymentId = samplePaymentId();
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(payment));
 
-        assertThatThrownBy(() -> paymentService.updatePaymentById(samplePaymentId(), updateDto))
+        assertThatThrownBy(() -> paymentService.updatePaymentById(paymentId, updateDto))
                 .isInstanceOf(InvalidPaymentStatusTransitionException.class);
     }
 
     @Test
     void updatePaymentByIdNotFound() {
-        PaymentUpdateDto updateDto = new PaymentUpdateDto();
+        final PaymentUpdateDto updateDto = new PaymentUpdateDto();
         updateDto.setStatus(PaymentStatus.COMPLETED);
+        final UUID paymentId = samplePaymentId();
 
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> paymentService.updatePaymentById(samplePaymentId(), updateDto))
+        assertThatThrownBy(() -> paymentService.updatePaymentById(paymentId, updateDto))
                 .isInstanceOf(PaymentNotFoundException.class);
     }
 
     @Test
     void updatePaymentByIdWithNullUpdateDto() {
+        final UUID paymentId = samplePaymentId();
+
         when(paymentRepository.findById(samplePaymentId())).thenReturn(Optional.of(samplePayment()));
 
-        assertThatThrownBy(() -> paymentService.updatePaymentById(samplePaymentId(), null))
+        assertThatThrownBy(() -> paymentService.updatePaymentById(paymentId, null))
                 .isInstanceOf(NullPointerException.class);
     }
 }

@@ -46,7 +46,9 @@ public class PaymentController {
     }
 
     @GetMapping("/status/{status}")
-    @Operation(summary = "Get payments by status", description = "Retrieves all payments with a specific status (PENDING, COMPLETED, FAILED, REFUNDED)")
+    @Operation(
+            summary = "Get payments by status",
+            description = "Retrieves all payments with a specific status (PENDING, COMPLETED, FAILED, REFUNDED)")
     public ResponseEntity<List<PaymentResponseDto>> getPaymentsByStatus(@PathVariable PaymentStatus status) {
         final List<PaymentResponseDto> payments = paymentService.getPaymentsByStatus(status);
         return ResponseEntity.ok(payments);

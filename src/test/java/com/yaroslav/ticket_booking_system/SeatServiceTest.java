@@ -57,14 +57,14 @@ class SeatServiceTest {
     }
 
     private Venue sampleVenue() {
-        Venue venue = new Venue();
+        final Venue venue = new Venue();
         venue.setId(sampleVenueId());
         venue.setName("Grand City Concert Hall");
         return venue;
     }
 
     private Seat sampleSeat() {
-        Seat seat = new Seat();
+        final Seat seat = new Seat();
         seat.setId(sampleSeatId());
         seat.setNumber(1);
         seat.setSection(1);
@@ -74,7 +74,7 @@ class SeatServiceTest {
     }
 
     private SeatRequestDto sampleRequestDto() {
-        SeatRequestDto dto = new SeatRequestDto();
+        final SeatRequestDto dto = new SeatRequestDto();
         dto.setNumber(1);
         dto.setSection(1);
         dto.setPrice(new BigDecimal("89.99"));
@@ -83,7 +83,7 @@ class SeatServiceTest {
     }
 
     private SeatResponseDto sampleResponseDto() {
-        SeatResponseDto dto = new SeatResponseDto();
+        final SeatResponseDto dto = new SeatResponseDto();
         dto.setId(sampleSeatId());
         dto.setNumber(1);
         dto.setSection(1);
@@ -94,17 +94,17 @@ class SeatServiceTest {
 
     @Test
     void createSeatSuccess() {
-        SeatRequestDto request = sampleRequestDto();
-        Venue venue = sampleVenue();
-        Seat seat = sampleSeat();
-        SeatResponseDto response = sampleResponseDto();
+        final SeatRequestDto request = sampleRequestDto();
+        final Venue venue = sampleVenue();
+        final Seat seat = sampleSeat();
+        final SeatResponseDto response = sampleResponseDto();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(seatRepository.existsByVenueIdAndSectionAndNumber(sampleVenueId(), 1, 1)).thenReturn(false);
         when(seatMapper.toEntity(request)).thenReturn(seat);
         when(seatMapper.toDto(seat)).thenReturn(response);
 
-        SeatResponseDto result = seatService.createSeat(request);
+        final SeatResponseDto result = seatService.createSeat(request);
 
         assertThat(result).isEqualTo(response);
         verify(seatRepository).save(seat);
@@ -112,7 +112,7 @@ class SeatServiceTest {
 
     @Test
     void createSeatVenueNotFound() {
-        SeatRequestDto request = sampleRequestDto();
+        final SeatRequestDto request = sampleRequestDto();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.empty());
 
@@ -122,8 +122,8 @@ class SeatServiceTest {
 
     @Test
     void createSeatDuplicate() {
-        SeatRequestDto request = sampleRequestDto();
-        Venue venue = sampleVenue();
+        final SeatRequestDto request = sampleRequestDto();
+        final Venue venue = sampleVenue();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(seatRepository.existsByVenueIdAndSectionAndNumber(sampleVenueId(), 1, 1)).thenReturn(true);
@@ -134,60 +134,64 @@ class SeatServiceTest {
 
     @Test
     void getSeatByIdSuccess() {
-        Seat seat = sampleSeat();
-        SeatResponseDto response = sampleResponseDto();
+        final Seat seat = sampleSeat();
+        final SeatResponseDto response = sampleResponseDto();
 
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(seat));
         when(seatMapper.toDto(seat)).thenReturn(response);
 
-        SeatResponseDto result = seatService.getSeatById(sampleSeatId());
+        final SeatResponseDto result = seatService.getSeatById(sampleSeatId());
 
         assertThat(result).isEqualTo(response);
     }
 
     @Test
     void getSeatByIdNotFound() {
+        final UUID seatId = sampleSeatId();
+
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> seatService.getSeatById(sampleSeatId()))
+        assertThatThrownBy(() -> seatService.getSeatById(seatId))
                 .isInstanceOf(SeatNotFoundException.class);
     }
 
     @Test
     void getSeatByVenueIdAndNumberSuccess() {
-        Seat seat = sampleSeat();
-        SeatResponseDto response = sampleResponseDto();
+        final Seat seat = sampleSeat();
+        final SeatResponseDto response = sampleResponseDto();
 
         when(seatRepository.findByVenueIdAndNumber(sampleVenueId(), 1)).thenReturn(Optional.of(seat));
         when(seatMapper.toDto(seat)).thenReturn(response);
 
-        SeatResponseDto result = seatService.getSeatByVenueIdAndNumber(sampleVenueId(), 1);
+        final SeatResponseDto result = seatService.getSeatByVenueIdAndNumber(sampleVenueId(), 1);
 
         assertThat(result).isEqualTo(response);
     }
 
     @Test
     void getSeatByVenueIdAndNumberNotFound() {
+        final UUID venueId = sampleVenueId();
+
         when(seatRepository.findByVenueIdAndNumber(sampleVenueId(), 999)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> seatService.getSeatByVenueIdAndNumber(sampleVenueId(), 999))
+        assertThatThrownBy(() -> seatService.getSeatByVenueIdAndNumber(venueId, 999))
                 .isInstanceOf(SeatNotFoundException.class);
     }
 
     @Test
     void getSeatsByVenueIdAndSectionSuccess() {
-        Seat seat1 = sampleSeat();
-        Seat seat2 = new Seat();
+        final Seat seat1 = sampleSeat();
+        final Seat seat2 = new Seat();
         seat2.setId(UUID.randomUUID());
         seat2.setNumber(2);
         seat2.setSection(1);
         seat2.setPrice(new BigDecimal("89.99"));
         seat2.setVenue(sampleVenue());
 
-        List<Seat> seats = List.of(seat1, seat2);
+        final List<Seat> seats = List.of(seat1, seat2);
 
-        SeatResponseDto response1 = sampleResponseDto();
-        SeatResponseDto response2 = new SeatResponseDto();
+        final SeatResponseDto response1 = sampleResponseDto();
+        final SeatResponseDto response2 = new SeatResponseDto();
         response2.setId(seat2.getId());
         response2.setNumber(2);
         response2.setSection(1);
@@ -198,7 +202,7 @@ class SeatServiceTest {
         when(seatMapper.toDto(seat1)).thenReturn(response1);
         when(seatMapper.toDto(seat2)).thenReturn(response2);
 
-        List<SeatResponseDto> result = seatService.getSeatsByVenueIdAndSection(sampleVenueId(), 1);
+        final List<SeatResponseDto> result = seatService.getSeatsByVenueIdAndSection(sampleVenueId(), 1);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0)).isEqualTo(response1);
@@ -209,23 +213,23 @@ class SeatServiceTest {
     void getSeatsByVenueIdAndSectionEmpty() {
         when(seatRepository.findByVenueIdAndSection(sampleVenueId(), 999)).thenReturn(Collections.emptyList());
 
-        List<SeatResponseDto> result = seatService.getSeatsByVenueIdAndSection(sampleVenueId(), 999);
+        final List<SeatResponseDto> result = seatService.getSeatsByVenueIdAndSection(sampleVenueId(), 999);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void getSeatsByPriceBetweenSuccess() {
-        BigDecimal min = new BigDecimal("50.00");
-        BigDecimal max = new BigDecimal("100.00");
+        final BigDecimal min = new BigDecimal("50.00");
+        final BigDecimal max = new BigDecimal("100.00");
 
-        Seat seat = sampleSeat();
-        SeatResponseDto response = sampleResponseDto();
+        final Seat seat = sampleSeat();
+        final SeatResponseDto response = sampleResponseDto();
 
         when(seatRepository.findByPriceBetween(min, max)).thenReturn(List.of(seat));
         when(seatMapper.toDto(seat)).thenReturn(response);
 
-        List<SeatResponseDto> result = seatService.getSeatsByPriceBetween(min, max);
+        final List<SeatResponseDto> result = seatService.getSeatsByPriceBetween(min, max);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(response);
@@ -233,29 +237,29 @@ class SeatServiceTest {
 
     @Test
     void getSeatsByPriceBetweenEmpty() {
-        BigDecimal min = new BigDecimal("500.00");
-        BigDecimal max = new BigDecimal("1000.00");
+        final BigDecimal min = new BigDecimal("500.00");
+        final BigDecimal max = new BigDecimal("1000.00");
 
         when(seatRepository.findByPriceBetween(min, max)).thenReturn(Collections.emptyList());
 
-        List<SeatResponseDto> result = seatService.getSeatsByPriceBetween(min, max);
+        final List<SeatResponseDto> result = seatService.getSeatsByPriceBetween(min, max);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void getAllSeatsSuccess() {
-        Seat seat1 = sampleSeat();
-        Seat seat2 = new Seat();
+        final Seat seat1 = sampleSeat();
+        final Seat seat2 = new Seat();
         seat2.setId(UUID.randomUUID());
         seat2.setNumber(2);
         seat2.setSection(1);
         seat2.setPrice(new BigDecimal("89.99"));
 
-        List<Seat> seats = List.of(seat1, seat2);
+        final List<Seat> seats = List.of(seat1, seat2);
 
-        SeatResponseDto response1 = sampleResponseDto();
-        SeatResponseDto response2 = new SeatResponseDto();
+        final SeatResponseDto response1 = sampleResponseDto();
+        final SeatResponseDto response2 = new SeatResponseDto();
         response2.setId(seat2.getId());
         response2.setNumber(2);
         response2.setSection(1);
@@ -265,7 +269,7 @@ class SeatServiceTest {
         when(seatMapper.toDto(seat1)).thenReturn(response1);
         when(seatMapper.toDto(seat2)).thenReturn(response2);
 
-        List<SeatResponseDto> result = seatService.getAllSeats();
+        final List<SeatResponseDto> result = seatService.getAllSeats();
 
         assertThat(result).hasSize(2);
     }
@@ -274,20 +278,20 @@ class SeatServiceTest {
     void getAllSeatsEmpty() {
         when(seatRepository.findAll()).thenReturn(Collections.emptyList());
 
-        List<SeatResponseDto> result = seatService.getAllSeats();
+        final List<SeatResponseDto> result = seatService.getAllSeats();
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void updateSeatByIdSuccess() {
-        SeatUpdateDto updateDto = new SeatUpdateDto();
+        final SeatUpdateDto updateDto = new SeatUpdateDto();
         updateDto.setNumber(2);
         updateDto.setSection(2);
         updateDto.setPrice(new BigDecimal("150.00"));
 
-        Seat seat = sampleSeat();
-        SeatResponseDto response = sampleResponseDto();
+        final Seat seat = sampleSeat();
+        final SeatResponseDto response = sampleResponseDto();
         response.setNumber(2);
         response.setSection(2);
         response.setPrice(new BigDecimal("150.00"));
@@ -295,7 +299,7 @@ class SeatServiceTest {
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(seat));
         when(seatMapper.toDto(seat)).thenReturn(response);
 
-        SeatResponseDto result = seatService.updateSeatById(sampleSeatId(), updateDto);
+        final SeatResponseDto result = seatService.updateSeatById(sampleSeatId(), updateDto);
 
         assertThat(result.getNumber()).isEqualTo(2);
         assertThat(result.getSection()).isEqualTo(2);
@@ -304,17 +308,17 @@ class SeatServiceTest {
 
     @Test
     void updateSeatByIdPartialUpdate() {
-        SeatUpdateDto updateDto = new SeatUpdateDto();
+        final SeatUpdateDto updateDto = new SeatUpdateDto();
         updateDto.setPrice(new BigDecimal("200.00"));
 
-        Seat seat = sampleSeat();
-        SeatResponseDto response = sampleResponseDto();
+        final Seat seat = sampleSeat();
+        final SeatResponseDto response = sampleResponseDto();
         response.setPrice(new BigDecimal("200.00"));
 
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(seat));
         when(seatMapper.toDto(seat)).thenReturn(response);
 
-        SeatResponseDto result = seatService.updateSeatById(sampleSeatId(), updateDto);
+        final SeatResponseDto result = seatService.updateSeatById(sampleSeatId(), updateDto);
 
         assertThat(result.getPrice()).isEqualTo(new BigDecimal("200.00"));
         assertThat(result.getNumber()).isEqualTo(1);
@@ -323,18 +327,19 @@ class SeatServiceTest {
 
     @Test
     void updateSeatByIdNotFound() {
-        SeatUpdateDto updateDto = new SeatUpdateDto();
+        final SeatUpdateDto updateDto = new SeatUpdateDto();
         updateDto.setNumber(2);
+        final UUID seatId = sampleSeatId();
 
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> seatService.updateSeatById(sampleSeatId(), updateDto))
+        assertThatThrownBy(() -> seatService.updateSeatById(seatId, updateDto))
                 .isInstanceOf(SeatNotFoundException.class);
     }
 
     @Test
     void deleteSeatByIdSuccess() {
-        Seat seat = sampleSeat();
+        final Seat seat = sampleSeat();
 
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(seat));
         when(ticketRepository.existsBySeatId(sampleSeatId())).thenReturn(false);
@@ -346,20 +351,23 @@ class SeatServiceTest {
 
     @Test
     void deleteSeatByIdNotFound() {
+        final UUID seatId = sampleSeatId();
+
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> seatService.deleteSeatById(sampleSeatId()))
+        assertThatThrownBy(() -> seatService.deleteSeatById(seatId))
                 .isInstanceOf(SeatNotFoundException.class);
     }
 
     @Test
     void deleteSeatByIdHasTickets() {
-        Seat seat = sampleSeat();
+        final Seat seat = sampleSeat();
+        final UUID seatId = sampleSeatId();
 
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(seat));
         when(ticketRepository.existsBySeatId(sampleSeatId())).thenReturn(true);
 
-        assertThatThrownBy(() -> seatService.deleteSeatById(sampleSeatId()))
+        assertThatThrownBy(() -> seatService.deleteSeatById(seatId))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Cannot delete seat with ID: " + sampleSeatId());
 

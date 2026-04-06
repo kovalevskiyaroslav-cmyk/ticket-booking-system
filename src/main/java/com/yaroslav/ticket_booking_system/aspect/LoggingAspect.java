@@ -61,7 +61,7 @@ public class LoggingAspect {
         final long startTime = System.nanoTime();
 
         try {
-            Object result = joinPoint.proceed();
+            final Object result = joinPoint.proceed();
 
             final long executionTimeMs = (System.nanoTime() - startTime) / 1_000_000;
 

@@ -45,7 +45,7 @@ class VenueServiceTest {
     }
 
     private Venue sampleVenue() {
-        Venue venue = new Venue();
+        final Venue venue = new Venue();
         venue.setId(sampleVenueId());
         venue.setName("Grand City Concert Hall");
         venue.setAddress("125 Riverside Avenue, New York");
@@ -53,14 +53,14 @@ class VenueServiceTest {
     }
 
     private VenueRequestDto sampleRequestDto() {
-        VenueRequestDto dto = new VenueRequestDto();
+        final VenueRequestDto dto = new VenueRequestDto();
         dto.setName("Grand City Concert Hall");
         dto.setAddress("125 Riverside Avenue, New York");
         return dto;
     }
 
     private VenueResponseDto sampleResponseDto() {
-        VenueResponseDto dto = new VenueResponseDto();
+        final VenueResponseDto dto = new VenueResponseDto();
         dto.setId(sampleVenueId());
         dto.setName("Grand City Concert Hall");
         dto.setAddress("125 Riverside Avenue, New York");
@@ -69,9 +69,9 @@ class VenueServiceTest {
 
     @Test
     void createVenueSuccess() {
-        VenueRequestDto request = sampleRequestDto();
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final VenueRequestDto request = sampleRequestDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
 
         when(venueRepository.existsByName(request.getName())).thenReturn(false);
         when(venueRepository.existsByAddress(request.getAddress())).thenReturn(false);
@@ -79,7 +79,7 @@ class VenueServiceTest {
         when(venueRepository.save(venue)).thenReturn(venue);
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.createVenue(request);
+        final VenueResponseDto result = venueService.createVenue(request);
 
         assertThat(result).isEqualTo(response);
         verify(venueRepository).save(venue);
@@ -87,7 +87,7 @@ class VenueServiceTest {
 
     @Test
     void createVenueDuplicateName() {
-        VenueRequestDto request = sampleRequestDto();
+        final VenueRequestDto request = sampleRequestDto();
 
         when(venueRepository.existsByName(request.getName())).thenReturn(true);
 
@@ -99,7 +99,7 @@ class VenueServiceTest {
 
     @Test
     void createVenueDuplicateAddress() {
-        VenueRequestDto request = sampleRequestDto();
+        final VenueRequestDto request = sampleRequestDto();
 
         when(venueRepository.existsByName(request.getName())).thenReturn(false);
         when(venueRepository.existsByAddress(request.getAddress())).thenReturn(true);
@@ -112,34 +112,36 @@ class VenueServiceTest {
 
     @Test
     void getVenueByIdSuccess() {
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.getVenueById(sampleVenueId());
+        final VenueResponseDto result = venueService.getVenueById(sampleVenueId());
 
         assertThat(result).isEqualTo(response);
     }
 
     @Test
     void getVenueByIdNotFound() {
+        final UUID venueId = sampleVenueId();
+
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> venueService.getVenueById(sampleVenueId()))
+        assertThatThrownBy(() -> venueService.getVenueById(venueId))
                 .isInstanceOf(VenueNotFoundException.class);
     }
 
     @Test
     void getVenueByNameSuccess() {
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
 
         when(venueRepository.findByName("Grand City Concert Hall")).thenReturn(Optional.of(venue));
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.getVenueByName("Grand City Concert Hall");
+        final VenueResponseDto result = venueService.getVenueByName("Grand City Concert Hall");
 
         assertThat(result).isEqualTo(response);
     }
@@ -154,13 +156,13 @@ class VenueServiceTest {
 
     @Test
     void getVenueByAddressSuccess() {
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
 
         when(venueRepository.findByAddress("125 Riverside Avenue, New York")).thenReturn(Optional.of(venue));
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.getVenueByAddress("125 Riverside Avenue, New York");
+        final VenueResponseDto result = venueService.getVenueByAddress("125 Riverside Avenue, New York");
 
         assertThat(result).isEqualTo(response);
     }
@@ -175,16 +177,16 @@ class VenueServiceTest {
 
     @Test
     void getAllVenuesSuccess() {
-        Venue venue1 = sampleVenue();
-        Venue venue2 = new Venue();
+        final Venue venue1 = sampleVenue();
+        final Venue venue2 = new Venue();
         venue2.setId(UUID.randomUUID());
         venue2.setName("Metropolitan Music Arena");
         venue2.setAddress("450 Madison Boulevard, New York");
 
-        List<Venue> venues = List.of(venue1, venue2);
+        final List<Venue> venues = List.of(venue1, venue2);
 
-        VenueResponseDto response1 = sampleResponseDto();
-        VenueResponseDto response2 = new VenueResponseDto();
+        final VenueResponseDto response1 = sampleResponseDto();
+        final VenueResponseDto response2 = new VenueResponseDto();
         response2.setId(venue2.getId());
         response2.setName("Metropolitan Music Arena");
         response2.setAddress("450 Madison Boulevard, New York");
@@ -193,7 +195,7 @@ class VenueServiceTest {
         when(venueMapper.toDto(venue1)).thenReturn(response1);
         when(venueMapper.toDto(venue2)).thenReturn(response2);
 
-        List<VenueResponseDto> result = venueService.getAllVenues();
+        final List<VenueResponseDto> result = venueService.getAllVenues();
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0)).isEqualTo(response1);
@@ -204,19 +206,19 @@ class VenueServiceTest {
     void getAllVenuesEmpty() {
         when(venueRepository.findAll()).thenReturn(Collections.emptyList());
 
-        List<VenueResponseDto> result = venueService.getAllVenues();
+        final List<VenueResponseDto> result = venueService.getAllVenues();
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void updateVenueByIdSuccess() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setName("Updated Venue Name");
         updateDto.setAddress("Updated Address");
 
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
         response.setName("Updated Venue Name");
         response.setAddress("Updated Address");
 
@@ -225,7 +227,7 @@ class VenueServiceTest {
         when(venueRepository.existsByAddress("Updated Address")).thenReturn(false);
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
+        final VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
 
         assertThat(result.getName()).isEqualTo("Updated Venue Name");
         assertThat(result.getAddress()).isEqualTo("Updated Address");
@@ -233,18 +235,18 @@ class VenueServiceTest {
 
     @Test
     void updateVenueByIdPartialUpdateName() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setName("Updated Venue Name Only");
 
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
         response.setName("Updated Venue Name Only");
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(venueRepository.existsByName("Updated Venue Name Only")).thenReturn(false);
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
+        final VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
 
         assertThat(result.getName()).isEqualTo("Updated Venue Name Only");
         assertThat(result.getAddress()).isEqualTo("125 Riverside Avenue, New York");
@@ -252,18 +254,18 @@ class VenueServiceTest {
 
     @Test
     void updateVenueByIdPartialUpdateAddress() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setAddress("Updated Address Only");
 
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
         response.setAddress("Updated Address Only");
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(venueRepository.existsByAddress("Updated Address Only")).thenReturn(false);
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
+        final VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
 
         assertThat(result.getName()).isEqualTo("Grand City Concert Hall");
         assertThat(result.getAddress()).isEqualTo("Updated Address Only");
@@ -271,41 +273,43 @@ class VenueServiceTest {
 
     @Test
     void updateVenueByIdNotFound() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setName("Updated Name");
+        final UUID venueId = sampleVenueId();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> venueService.updateVenueById(sampleVenueId(), updateDto))
+        assertThatThrownBy(() -> venueService.updateVenueById(venueId, updateDto))
                 .isInstanceOf(VenueNotFoundException.class);
     }
 
     @Test
     void updateVenueByIdDuplicateName() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setName("Existing Venue Name");
 
-        Venue venue = sampleVenue();
+        final Venue venue = sampleVenue();
+        final UUID venueId = sampleVenueId();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(venueRepository.existsByName("Existing Venue Name")).thenReturn(true);
 
-        assertThatThrownBy(() -> venueService.updateVenueById(sampleVenueId(), updateDto))
+        assertThatThrownBy(() -> venueService.updateVenueById(venueId, updateDto))
                 .isInstanceOf(DuplicateVenueNameException.class);
     }
 
     @Test
     void updateVenueByIdSameNameNoDuplicateCheck() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setName("Grand City Concert Hall");
 
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
+        final VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
 
         assertThat(result).isEqualTo(response);
         verify(venueRepository, never()).existsByName("Grand City Concert Hall");
@@ -313,31 +317,32 @@ class VenueServiceTest {
 
     @Test
     void updateVenueByIdDuplicateAddress() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setAddress("Existing Address");
 
-        Venue venue = sampleVenue();
+        final Venue venue = sampleVenue();
+        final UUID venueId = sampleVenueId();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(venueRepository.existsByAddress("Existing Address")).thenReturn(true);
 
-        assertThatThrownBy(() -> venueService.updateVenueById(sampleVenueId(), updateDto))
+        assertThatThrownBy(() -> venueService.updateVenueById(venueId, updateDto))
                 .isInstanceOf(DuplicateVenueAddressException.class);
     }
 
     @Test
     void updateVenueByIdSameAddressNoDuplicateCheck() {
-        VenueUpdateDto updateDto = new VenueUpdateDto();
+        final VenueUpdateDto updateDto = new VenueUpdateDto();
         updateDto.setAddress("125 Riverside Avenue, New York");
 
-        Venue venue = sampleVenue();
-        VenueResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
+        final VenueResponseDto response = sampleResponseDto();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
         when(venueRepository.existsByAddress("125 Riverside Avenue, New York")).thenReturn(true);
         when(venueMapper.toDto(venue)).thenReturn(response);
 
-        VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
+        final VenueResponseDto result = venueService.updateVenueById(sampleVenueId(), updateDto);
 
         assertThat(result).isEqualTo(response);
         verify(venueRepository).existsByAddress("125 Riverside Avenue, New York");
@@ -345,7 +350,7 @@ class VenueServiceTest {
 
     @Test
     void deleteVenueByIdSuccess() {
-        Venue venue = sampleVenue();
+        final Venue venue = sampleVenue();
 
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.of(venue));
 
@@ -356,9 +361,11 @@ class VenueServiceTest {
 
     @Test
     void deleteVenueByIdNotFound() {
+        final UUID venueId = sampleVenueId();
+
         when(venueRepository.findById(sampleVenueId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> venueService.deleteVenueById(sampleVenueId()))
+        assertThatThrownBy(() -> venueService.deleteVenueById(venueId))
                 .isInstanceOf(VenueNotFoundException.class);
     }
 }

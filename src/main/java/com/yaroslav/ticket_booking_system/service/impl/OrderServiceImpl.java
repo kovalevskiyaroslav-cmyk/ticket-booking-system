@@ -116,10 +116,10 @@ public class OrderServiceImpl implements OrderService {
             return Collections.emptyList();
         }
 
-        List<OrderResponseDto> responses = new ArrayList<>();
+        final List<OrderResponseDto> responses = new ArrayList<>();
 
         for (OrderRequestDto requestDto : requestDtos) {
-            OrderResponseDto createdOrder = createSingleOrder(requestDto);
+            final OrderResponseDto createdOrder = createSingleOrder(requestDto);
             responses.add(createdOrder);
         }
 

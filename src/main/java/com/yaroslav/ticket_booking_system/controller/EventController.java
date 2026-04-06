@@ -60,12 +60,6 @@ public class EventController {
         return ResponseEntity.ok(event);
     }
 
-    @GetMapping("/test/500")
-    @Operation(summary = "Test 500 error", description = "Endpoint for testing internal server error handling")
-    public String test500() {
-        throw new RuntimeException("Test 500 error");
-    }
-
     @GetMapping("/by-date")
     @Operation(summary = "Get events by date range", description = "Retrieves all events occurring between two dates")
     public ResponseEntity<List<EventResponseDto>> getEventsByDateTimeBetween(

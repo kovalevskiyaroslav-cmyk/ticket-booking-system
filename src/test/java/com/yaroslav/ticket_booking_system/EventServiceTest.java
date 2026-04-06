@@ -61,7 +61,7 @@ class EventServiceTest {
     }
 
     private EventRequestDto sampleRequestDto() {
-        EventRequestDto dto = new EventRequestDto();
+        final EventRequestDto dto = new EventRequestDto();
         dto.setName("Legends of Rock Live");
         dto.setDescription("A high-energy rock concert");
         dto.setDateTime(LocalDateTime.of(2026, 3, 10, 20, 0));
@@ -70,7 +70,7 @@ class EventServiceTest {
     }
 
     private EventResponseDto sampleResponseDto() {
-        EventResponseDto dto = new EventResponseDto();
+        final EventResponseDto dto = new EventResponseDto();
         dto.setId(sampleEventId());
         dto.setName("Legends of Rock Live");
         dto.setDescription("A high-energy rock concert");
@@ -80,7 +80,7 @@ class EventServiceTest {
     }
 
     private Venue sampleVenue() {
-        Venue venue = new Venue();
+        final Venue venue = new Venue();
         venue.setId(sampleVenueId());
         venue.setName("Grand City Concert Hall");
         venue.setAddress("125 Riverside Avenue, New York");
@@ -88,7 +88,7 @@ class EventServiceTest {
     }
 
     private Event sampleEvent() {
-        Event event = new Event();
+        final Event event = new Event();
         event.setId(sampleEventId());
         event.setName("Legends of Rock Live");
         event.setDescription("A high-energy rock concert");
@@ -99,10 +99,10 @@ class EventServiceTest {
 
     @Test
     void createEventSuccess() {
-        EventRequestDto request = sampleRequestDto();
-        Event eventEntity = sampleEvent();
-        EventResponseDto response = sampleResponseDto();
-        Venue venue = sampleVenue();
+        final EventRequestDto request = sampleRequestDto();
+        final Event eventEntity = sampleEvent();
+        final EventResponseDto response = sampleResponseDto();
+        final Venue venue = sampleVenue();
 
         when(eventRepository.existsByName(request.getName())).thenReturn(false);
         when(eventMapper.toEntity(request)).thenReturn(eventEntity);
@@ -110,7 +110,7 @@ class EventServiceTest {
         when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
         when(eventMapper.toDto(eventEntity)).thenReturn(response);
 
-        EventResponseDto result = eventService.createEvent(request);
+        final EventResponseDto result = eventService.createEvent(request);
 
         assertThat(result).isEqualTo(response);
         verify(eventRepository).save(eventEntity);
@@ -118,7 +118,7 @@ class EventServiceTest {
 
     @Test
     void createEventDuplicateName() {
-        EventRequestDto request = sampleRequestDto();
+        final EventRequestDto request = sampleRequestDto();
         when(eventRepository.existsByName(request.getName())).thenReturn(true);
 
         assertThatThrownBy(() -> eventService.createEvent(request))
@@ -129,7 +129,7 @@ class EventServiceTest {
 
     @Test
     void createEventVenueNotFound() {
-        EventRequestDto request = sampleRequestDto();
+        final EventRequestDto request = sampleRequestDto();
         when(eventRepository.existsByName(request.getName())).thenReturn(false);
         when(venueRepository.findById(request.getVenueId())).thenReturn(Optional.empty());
 
@@ -141,34 +141,36 @@ class EventServiceTest {
 
     @Test
     void getEventByIdSuccess() {
-        Event event = sampleEvent();
-        EventResponseDto response = sampleResponseDto();
+        final Event event = sampleEvent();
+        final EventResponseDto response = sampleResponseDto();
 
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
         when(eventMapper.toDto(event)).thenReturn(response);
 
-        EventResponseDto result = eventService.getEventById(sampleEventId());
+        final EventResponseDto result = eventService.getEventById(sampleEventId());
 
         assertThat(result).isEqualTo(response);
     }
 
     @Test
     void getEventByIdNotFound() {
-        when(eventRepository.findById(sampleEventId())).thenReturn(Optional.empty());
+        final UUID id = sampleEventId();
 
-        assertThatThrownBy(() -> eventService.getEventById(sampleEventId()))
+        when(eventRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> eventService.getEventById(id))
                 .isInstanceOf(EventNotFoundException.class);
     }
 
     @Test
     void getEventByNameSuccess() {
-        Event event = sampleEvent();
-        EventResponseDto response = sampleResponseDto();
+        final Event event = sampleEvent();
+        final EventResponseDto response = sampleResponseDto();
 
         when(eventRepository.findByName("Legends of Rock Live")).thenReturn(Optional.of(event));
         when(eventMapper.toDto(event)).thenReturn(response);
 
-        EventResponseDto result = eventService.getEventByName("Legends of Rock Live");
+        final EventResponseDto result = eventService.getEventByName("Legends of Rock Live");
 
         assertThat(result).isEqualTo(response);
     }
@@ -183,45 +185,44 @@ class EventServiceTest {
 
     @Test
     void getEventsByDateTimeBetweenSuccess() {
-        LocalDateTime start = LocalDateTime.of(2026, 3, 1, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2026, 3, 31, 23, 59);
-        Event event = sampleEvent();
-        EventResponseDto response = sampleResponseDto();
-        List<Event> events = List.of(event);
-        List<EventResponseDto> expectedResponses = List.of(response);
+        final LocalDateTime start = LocalDateTime.of(2026, 3, 1, 0, 0);
+        final LocalDateTime end = LocalDateTime.of(2026, 3, 31, 23, 59);
+        final Event event = sampleEvent();
+        final EventResponseDto response = sampleResponseDto();
+        final List<Event> events = List.of(event);
+        final List<EventResponseDto> expectedResponses = List.of(response);
 
         when(eventRepository.findByDateTimeBetween(start, end)).thenReturn(events);
         when(eventMapper.toDto(event)).thenReturn(response);
 
-        List<EventResponseDto> result = eventService.getEventsByDateTimeBetween(start, end);
+        final List<EventResponseDto> result = eventService.getEventsByDateTimeBetween(start, end);
 
-        assertThat(result).hasSize(1);
-        assertThat(result).isEqualTo(expectedResponses);
+        assertThat(result).hasSize(1).isEqualTo(expectedResponses);
     }
 
     @Test
     void getEventsByDateTimeBetweenEmpty() {
-        LocalDateTime start = LocalDateTime.of(2026, 3, 1, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2026, 3, 31, 23, 59);
+        final LocalDateTime start = LocalDateTime.of(2026, 3, 1, 0, 0);
+        final LocalDateTime end = LocalDateTime.of(2026, 3, 31, 23, 59);
 
         when(eventRepository.findByDateTimeBetween(start, end)).thenReturn(List.of());
 
-        List<EventResponseDto> result = eventService.getEventsByDateTimeBetween(start, end);
+        final List<EventResponseDto> result = eventService.getEventsByDateTimeBetween(start, end);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void getAllEventsSuccess() {
-        Event event = sampleEvent();
-        EventResponseDto response = sampleResponseDto();
-        List<Event> events = List.of(event);
-        List<EventResponseDto> expectedResponses = List.of(response);
+        final Event event = sampleEvent();
+        final EventResponseDto response = sampleResponseDto();
+        final List<Event> events = List.of(event);
+        final List<EventResponseDto> expectedResponses = List.of(response);
 
         when(eventRepository.findAll()).thenReturn(events);
         when(eventMapper.toDto(event)).thenReturn(response);
 
-        List<EventResponseDto> result = eventService.getAllEvents();
+        final List<EventResponseDto> result = eventService.getAllEvents();
 
         assertThat(result).isEqualTo(expectedResponses);
     }
@@ -230,26 +231,26 @@ class EventServiceTest {
     void getAllEventsEmpty() {
         when(eventRepository.findAll()).thenReturn(List.of());
 
-        List<EventResponseDto> result = eventService.getAllEvents();
+        final List<EventResponseDto> result = eventService.getAllEvents();
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void updateByIdSuccess() {
-        UUID eventId = sampleEventId();
-        EventUpdateDto updateDto = new EventUpdateDto();
+        final UUID eventId = sampleEventId();
+        final EventUpdateDto updateDto = new EventUpdateDto();
         updateDto.setName("Updated Event Name");
         updateDto.setDescription("Updated description");
         updateDto.setDateTime(LocalDateTime.of(2026, 4, 15, 19, 0));
 
-        Event existingEvent = sampleEvent();
-        Event updatedEvent = sampleEvent();
+        final Event existingEvent = sampleEvent();
+        final Event updatedEvent = sampleEvent();
         updatedEvent.setName("Updated Event Name");
         updatedEvent.setDescription("Updated description");
         updatedEvent.setDateTime(LocalDateTime.of(2026, 4, 15, 19, 0));
 
-        EventResponseDto response = sampleResponseDto();
+        final EventResponseDto response = sampleResponseDto();
         response.setName("Updated Event Name");
         response.setDescription("Updated description");
         response.setDateTime(LocalDateTime.of(2026, 4, 15, 19, 0));
@@ -258,7 +259,7 @@ class EventServiceTest {
         when(eventRepository.existsByName("Updated Event Name")).thenReturn(false);
         when(eventMapper.toDto(existingEvent)).thenReturn(response);
 
-        EventResponseDto result = eventService.updateById(eventId, updateDto);
+        final EventResponseDto result = eventService.updateById(eventId, updateDto);
 
         assertThat(result.getName()).isEqualTo("Updated Event Name");
         assertThat(result.getDescription()).isEqualTo("Updated description");
@@ -267,11 +268,11 @@ class EventServiceTest {
 
     @Test
     void updateByIdNameDuplicate() {
-        UUID eventId = sampleEventId();
-        EventUpdateDto updateDto = new EventUpdateDto();
+        final UUID eventId = sampleEventId();
+        final EventUpdateDto updateDto = new EventUpdateDto();
         updateDto.setName("Existing Event Name");
 
-        Event existingEvent = sampleEvent();
+        final Event existingEvent = sampleEvent();
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
         when(eventRepository.existsByName("Existing Event Name")).thenReturn(true);
@@ -282,12 +283,12 @@ class EventServiceTest {
 
     @Test
     void updateByIdVenueNotFound() {
-        UUID eventId = sampleEventId();
-        UUID newVenueId = UUID.randomUUID();
-        EventUpdateDto updateDto = new EventUpdateDto();
+        final UUID eventId = sampleEventId();
+        final UUID newVenueId = UUID.randomUUID();
+        final EventUpdateDto updateDto = new EventUpdateDto();
         updateDto.setVenueId(newVenueId);
 
-        Event existingEvent = sampleEvent();
+        final Event existingEvent = sampleEvent();
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
         when(venueRepository.findById(newVenueId)).thenReturn(Optional.empty());
@@ -298,8 +299,8 @@ class EventServiceTest {
 
     @Test
     void updateByIdEventNotFound() {
-        UUID eventId = sampleEventId();
-        EventUpdateDto updateDto = new EventUpdateDto();
+        final UUID eventId = sampleEventId();
+        final EventUpdateDto updateDto = new EventUpdateDto();
         updateDto.setName("Updated Name");
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
@@ -310,8 +311,8 @@ class EventServiceTest {
 
     @Test
     void deleteByIdSuccess() {
-        UUID eventId = sampleEventId();
-        Event event = sampleEvent();
+        final UUID eventId = sampleEventId();
+        final Event event = sampleEvent();
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
         when(ticketRepository.existsByEventId(eventId)).thenReturn(false);
@@ -323,7 +324,7 @@ class EventServiceTest {
 
     @Test
     void deleteByIdEventNotFound() {
-        UUID eventId = sampleEventId();
+        final UUID eventId = sampleEventId();
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
 
@@ -335,8 +336,8 @@ class EventServiceTest {
 
     @Test
     void deleteByIdEventHasTickets() {
-        UUID eventId = sampleEventId();
-        Event event = sampleEvent();
+        final UUID eventId = sampleEventId();
+        final Event event = sampleEvent();
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
         when(ticketRepository.existsByEventId(eventId)).thenReturn(true);

@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleGenericException(Exception ex) {
         log.error("Internal server error", ex); // stacktrace ONLY here
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred"
         );
@@ -118,7 +118,7 @@ public class GlobalExceptionHandler {
     private ProblemDetail clientError(HttpStatus status, String title, String detail) {
         log.warn("{}: {}", title, detail); // no stacktrace
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
         problemDetail.setTitle(title);
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;

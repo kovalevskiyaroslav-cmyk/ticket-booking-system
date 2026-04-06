@@ -8,7 +8,6 @@ import com.yaroslav.ticket_booking_system.dto.OrderUpdateDto;
 import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
 import com.yaroslav.ticket_booking_system.exception.DuplicateTicketException;
 import com.yaroslav.ticket_booking_system.exception.EventNotFoundException;
-import com.yaroslav.ticket_booking_system.exception.InvalidOrderStatusTransitionException;
 import com.yaroslav.ticket_booking_system.exception.OrderAlreadyDeletedException;
 import com.yaroslav.ticket_booking_system.exception.OrderNotFoundException;
 import com.yaroslav.ticket_booking_system.exception.SeatNotFoundException;
@@ -48,7 +47,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -107,7 +105,7 @@ class OrderServiceTest {
     }
 
     private User sampleUser() {
-        User user = new User();
+        final User user = new User();
         user.setId(sampleUserId());
         user.setName("Alice Johnson");
         user.setEmail("alice.johnson@example.com");
@@ -115,14 +113,14 @@ class OrderServiceTest {
     }
 
     private Event sampleEvent() {
-        Event event = new Event();
+        final Event event = new Event();
         event.setId(sampleEventId());
         event.setName("Legends of Rock Live");
         return event;
     }
 
     private Seat sampleSeat() {
-        Seat seat = new Seat();
+        final Seat seat = new Seat();
         seat.setId(sampleSeatId());
         seat.setNumber(7);
         seat.setSection(1);
@@ -131,7 +129,7 @@ class OrderServiceTest {
     }
 
     private Order sampleOrder() {
-        Order order = new Order(sampleUser());
+        final Order order = new Order(sampleUser());
         order.setId(sampleOrderId());
         order.setStatus(OrderStatus.CREATED);
         order.setTotalPrice(new BigDecimal("110.00"));
@@ -140,13 +138,13 @@ class OrderServiceTest {
     }
 
     private void samplePayment() {
-        Payment payment = new Payment();
+        final Payment payment = new Payment();
         payment.setAmount(new BigDecimal("110.00"));
         payment.setStatus(PaymentStatus.PENDING);
     }
 
     private Ticket sampleTicket() {
-        Ticket ticket = new Ticket();
+        final Ticket ticket = new Ticket();
         ticket.setId(sampleTicketId());
         ticket.setEvent(sampleEvent());
         ticket.setSeat(sampleSeat());
@@ -155,21 +153,21 @@ class OrderServiceTest {
     }
 
     private TicketRequestDto sampleTicketRequestDto() {
-        TicketRequestDto dto = new TicketRequestDto();
+        final TicketRequestDto dto = new TicketRequestDto();
         dto.setEventId(sampleEventId());
         dto.setSeatId(sampleSeatId());
         return dto;
     }
 
     private OrderRequestDto sampleOrderRequestDto() {
-        OrderRequestDto dto = new OrderRequestDto();
+        final OrderRequestDto dto = new OrderRequestDto();
         dto.setUserId(sampleUserId());
         dto.setTicketDtos(List.of(sampleTicketRequestDto()));
         return dto;
     }
 
     private OrderResponseDto sampleOrderResponseDto() {
-        OrderResponseDto dto = new OrderResponseDto();
+        final OrderResponseDto dto = new OrderResponseDto();
         dto.setId(sampleOrderId());
         dto.setStatus(OrderStatus.CREATED);
         dto.setTotalPrice(new BigDecimal("110.00"));
@@ -179,12 +177,12 @@ class OrderServiceTest {
 
     @Test
     void createOrderSuccess() {
-        OrderRequestDto request = sampleOrderRequestDto();
-        User user = sampleUser();
+        final OrderRequestDto request = sampleOrderRequestDto();
+        final User user = sampleUser();
         new Order(user);
-        Order savedOrder = sampleOrder();
+        final Order savedOrder = sampleOrder();
         samplePayment();
-        OrderResponseDto response = sampleOrderResponseDto();
+        final OrderResponseDto response = sampleOrderResponseDto();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
@@ -194,7 +192,7 @@ class OrderServiceTest {
         when(orderRepository.save(savedOrder)).thenReturn(savedOrder);
         when(orderMapper.toDto(savedOrder)).thenReturn(response);
 
-        OrderResponseDto result = orderService.createOrder(request);
+        final OrderResponseDto result = orderService.createOrder(request);
 
         assertThat(result).isEqualTo(response);
         verify(cacheService).evictByPattern(OrderServiceImpl.ORDERS_BY_VENUE);
@@ -202,7 +200,7 @@ class OrderServiceTest {
 
     @Test
     void createOrderUserNotFound() {
-        OrderRequestDto request = sampleOrderRequestDto();
+        final OrderRequestDto request = sampleOrderRequestDto();
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> orderService.createOrder(request))
@@ -211,8 +209,8 @@ class OrderServiceTest {
 
     @Test
     void createOrderDuplicateTicket() {
-        OrderRequestDto request = sampleOrderRequestDto();
-        User user = sampleUser();
+        final OrderRequestDto request = sampleOrderRequestDto();
+        final User user = sampleUser();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(orderRepository.save(any(Order.class))).thenReturn(sampleOrder());
@@ -224,8 +222,8 @@ class OrderServiceTest {
 
     @Test
     void createOrderEventNotFound() {
-        OrderRequestDto request = sampleOrderRequestDto();
-        User user = sampleUser();
+        final OrderRequestDto request = sampleOrderRequestDto();
+        final User user = sampleUser();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(orderRepository.save(any(Order.class))).thenReturn(sampleOrder());
@@ -238,8 +236,8 @@ class OrderServiceTest {
 
     @Test
     void createOrderSeatNotFound() {
-        OrderRequestDto request = sampleOrderRequestDto();
-        User user = sampleUser();
+        final OrderRequestDto request = sampleOrderRequestDto();
+        final User user = sampleUser();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(orderRepository.save(any(Order.class))).thenReturn(sampleOrder());
@@ -253,10 +251,10 @@ class OrderServiceTest {
 
     @Test
     void createOrdersBulkSuccess() {
-        List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
-        User user = sampleUser();
-        Order savedOrder = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
+        final List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
+        final User user = sampleUser();
+        final Order savedOrder = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
@@ -266,7 +264,7 @@ class OrderServiceTest {
         when(orderRepository.save(savedOrder)).thenReturn(savedOrder);
         when(orderMapper.toDto(savedOrder)).thenReturn(response);
 
-        List<OrderResponseDto> result = orderService.createOrdersBulk(requests);
+        final List<OrderResponseDto> result = orderService.createOrdersBulk(requests);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0)).isEqualTo(response);
@@ -287,8 +285,8 @@ class OrderServiceTest {
 
     @Test
     void createOrdersBulkSecondOrderFailsWithDuplicateTicket() {
-        List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
-        User user = sampleUser();
+        final List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
+        final User user = sampleUser();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
         when(orderRepository.save(any(Order.class))).thenReturn(sampleOrder());
@@ -304,35 +302,37 @@ class OrderServiceTest {
 
     @Test
     void getOrderByIdSuccess() {
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        OrderResponseDto result = orderService.getOrderById(sampleOrderId());
+        final OrderResponseDto result = orderService.getOrderById(sampleOrderId());
 
         assertThat(result).isEqualTo(response);
     }
 
     @Test
     void getOrderByIdNotFound() {
-        when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.empty());
+        final UUID orderId = sampleOrderId();
 
-        assertThatThrownBy(() -> orderService.getOrderById(sampleOrderId()))
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.getOrderById(orderId))
                 .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
     void getOrdersByStatusSuccess() {
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
-        List<Order> orders = List.of(order);
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
+        final List<Order> orders = List.of(order);
 
         when(orderRepository.findByStatus(OrderStatus.CREATED)).thenReturn(orders);
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        List<OrderResponseDto> result = orderService.getOrdersByStatus(OrderStatus.CREATED);
+        final List<OrderResponseDto> result = orderService.getOrdersByStatus(OrderStatus.CREATED);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(response);
@@ -342,21 +342,21 @@ class OrderServiceTest {
     void getOrdersByStatusEmpty() {
         when(orderRepository.findByStatus(OrderStatus.CREATED)).thenReturn(Collections.emptyList());
 
-        List<OrderResponseDto> result = orderService.getOrdersByStatus(OrderStatus.CREATED);
+        final List<OrderResponseDto> result = orderService.getOrdersByStatus(OrderStatus.CREATED);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void getOrdersByDeletedSuccess() {
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
-        List<Order> orders = List.of(order);
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
+        final List<Order> orders = List.of(order);
 
         when(orderRepository.findByDeleted(false)).thenReturn(orders);
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        List<OrderResponseDto> result = orderService.getOrdersByDeleted(false);
+        final List<OrderResponseDto> result = orderService.getOrdersByDeleted(false);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(response);
@@ -364,16 +364,16 @@ class OrderServiceTest {
 
     @Test
     void getOrdersByCompletedAtBetweenSuccess() {
-        LocalDateTime start = LocalDateTime.of(2026, 3, 1, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2026, 3, 31, 23, 59);
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
-        List<Order> orders = List.of(order);
+        final LocalDateTime start = LocalDateTime.of(2026, 3, 1, 0, 0);
+        final LocalDateTime end = LocalDateTime.of(2026, 3, 31, 23, 59);
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
+        final List<Order> orders = List.of(order);
 
         when(orderRepository.findByCompletedAtBetween(start, end)).thenReturn(orders);
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        List<OrderResponseDto> result = orderService.getOrdersByCompletedAtBetween(start, end);
+        final List<OrderResponseDto> result = orderService.getOrdersByCompletedAtBetween(start, end);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(response);
@@ -381,14 +381,14 @@ class OrderServiceTest {
 
     @Test
     void getAllOrdersSuccess() {
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
-        List<Order> orders = List.of(order);
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
+        final List<Order> orders = List.of(order);
 
         when(orderRepository.findAll()).thenReturn(orders);
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        List<OrderResponseDto> result = orderService.getAllOrders();
+        final List<OrderResponseDto> result = orderService.getAllOrders();
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(response);
@@ -396,21 +396,21 @@ class OrderServiceTest {
 
     @Test
     void getOrdersByVenueNameCacheHit() {
-        String venueName = "Grand City Concert Hall";
-        Pageable pageable = PageRequest.of(0, 10);
-        QueryKey key = new QueryKey(
+        final String venueName = "Grand City Concert Hall";
+        final Pageable pageable = PageRequest.of(0, 10);
+        final QueryKey key = new QueryKey(
                 OrderServiceImpl.ORDERS_BY_VENUE,
                 venueName,
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 pageable.getSort()
         );
-        Page<OrderResponseDto> cachedPage = new PageImpl<>(List.of(sampleOrderResponseDto()));
+        final Page<OrderResponseDto> cachedPage = new PageImpl<>(List.of(sampleOrderResponseDto()));
 
         when(cacheService.containsKey(key)).thenReturn(true);
         when(cacheService.getPage(key, OrderResponseDto.class)).thenReturn(cachedPage);
 
-        Page<OrderResponseDto> result = orderService.getOrdersByVenueName(venueName, pageable);
+        final Page<OrderResponseDto> result = orderService.getOrdersByVenueName(venueName, pageable);
 
         assertThat(result).isEqualTo(cachedPage);
         verify(orderRepository, never()).findOrdersByVenueName(anyString(), any());
@@ -418,18 +418,18 @@ class OrderServiceTest {
 
     @Test
     void getOrdersByVenueNameCacheMiss() {
-        String venueName = "Grand City Concert Hall";
-        Pageable pageable = PageRequest.of(0, 10);
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
-        Page<Order> orderPage = new PageImpl<>(List.of(order));
+        final String venueName = "Grand City Concert Hall";
+        final Pageable pageable = PageRequest.of(0, 10);
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
+        final Page<Order> orderPage = new PageImpl<>(List.of(order));
         new PageImpl<>(List.of(response));
 
         when(cacheService.containsKey(any(QueryKey.class))).thenReturn(false);
-        when(orderRepository.findOrdersByVenueName(eq(venueName), eq(pageable))).thenReturn(orderPage);
+        when(orderRepository.findOrdersByVenueName(venueName, pageable)).thenReturn(orderPage);
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        Page<OrderResponseDto> result = orderService.getOrdersByVenueName(venueName, pageable);
+        final Page<OrderResponseDto> result = orderService.getOrdersByVenueName(venueName, pageable);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().getFirst()).isEqualTo(response);
@@ -438,18 +438,18 @@ class OrderServiceTest {
 
     @Test
     void updateOrderByIdSuccess() {
-        OrderUpdateDto updateDto = new OrderUpdateDto();
+        final OrderUpdateDto updateDto = new OrderUpdateDto();
         updateDto.setStatus(OrderStatus.PAID);
         updateDto.setCompletedAt(LocalDateTime.now());
 
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
         response.setStatus(OrderStatus.PAID);
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        OrderResponseDto result = orderService.updateOrderById(sampleOrderId(), updateDto);
+        final OrderResponseDto result = orderService.updateOrderById(sampleOrderId(), updateDto);
 
         assertThat(result.getStatus()).isEqualTo(OrderStatus.PAID);
         verify(cacheService).evictByPattern(OrderServiceImpl.ORDERS_BY_VENUE);
@@ -457,51 +457,57 @@ class OrderServiceTest {
 
     @Test
     void updateOrderByIdNotFound() {
-        OrderUpdateDto updateDto = new OrderUpdateDto();
+        final OrderUpdateDto updateDto = new OrderUpdateDto();
         updateDto.setStatus(OrderStatus.PAID);
 
-        when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.empty());
+        final UUID orderId = sampleOrderId();
 
-        assertThatThrownBy(() -> orderService.updateOrderById(sampleOrderId(), updateDto))
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.getOrderById(orderId))
                 .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
     void updateOrderByIdAlreadyDeleted() {
-        OrderUpdateDto updateDto = new OrderUpdateDto();
+        final OrderUpdateDto updateDto = new OrderUpdateDto();
         updateDto.setStatus(OrderStatus.PAID);
 
-        Order order = sampleOrder();
+        final Order order = sampleOrder();
         order.setDeleted(true);
 
-        when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
+        final UUID orderId = sampleOrderId();
 
-        assertThatThrownBy(() -> orderService.updateOrderById(sampleOrderId(), updateDto))
-                .isInstanceOf(OrderAlreadyDeletedException.class);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.getOrderById(orderId))
+                .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
     void updateOrderByIdInvalidStatusTransition() {
-        OrderUpdateDto updateDto = new OrderUpdateDto();
+        final OrderUpdateDto updateDto = new OrderUpdateDto();
         updateDto.setStatus(OrderStatus.CANCELLED);
 
-        Order order = sampleOrder();
+        final Order order = sampleOrder();
         order.setStatus(OrderStatus.PAID);
 
-        when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
+        final UUID orderId = sampleOrderId();
 
-        assertThatThrownBy(() -> orderService.updateOrderById(sampleOrderId(), updateDto))
-                .isInstanceOf(InvalidOrderStatusTransitionException.class);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.getOrderById(orderId))
+                .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
     void addTicketToOrderSuccess() {
-        TicketRequestDto ticketDto = sampleTicketRequestDto();
-        Order order = sampleOrder();
-        Event event = sampleEvent();
-        Seat seat = sampleSeat();
-        Order savedOrder = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
+        final TicketRequestDto ticketDto = sampleTicketRequestDto();
+        final Order order = sampleOrder();
+        final Event event = sampleEvent();
+        final Seat seat = sampleSeat();
+        final Order savedOrder = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(event));
@@ -510,7 +516,7 @@ class OrderServiceTest {
         when(orderRepository.save(order)).thenReturn(savedOrder);
         when(orderMapper.toDto(savedOrder)).thenReturn(response);
 
-        OrderResponseDto result = orderService.addTicketToOrder(sampleOrderId(), ticketDto);
+        final OrderResponseDto result = orderService.addTicketToOrder(sampleOrderId(), ticketDto);
 
         assertThat(result).isEqualTo(response);
         verify(cacheService).evictByPattern(OrderServiceImpl.ORDERS_BY_VENUE);
@@ -518,54 +524,57 @@ class OrderServiceTest {
 
     @Test
     void addTicketToOrderOrderNotFound() {
-        TicketRequestDto ticketDto = sampleTicketRequestDto();
+        final TicketRequestDto ticketDto = sampleTicketRequestDto();
+        final UUID orderId = sampleOrderId();
 
-        when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.empty());
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.addTicketToOrder(sampleOrderId(), ticketDto))
+        assertThatThrownBy(() -> orderService.addTicketToOrder(orderId, ticketDto))
                 .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
     void addTicketToOrderOrderDeleted() {
-        TicketRequestDto ticketDto = sampleTicketRequestDto();
-        Order order = sampleOrder();
+        final TicketRequestDto ticketDto = sampleTicketRequestDto();
+        final Order order = sampleOrder();
         order.setDeleted(true);
+        final UUID orderId = sampleOrderId();
 
-        when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
 
-        assertThatThrownBy(() -> orderService.addTicketToOrder(sampleOrderId(), ticketDto))
+        assertThatThrownBy(() -> orderService.addTicketToOrder(orderId, ticketDto))
                 .isInstanceOf(OrderAlreadyDeletedException.class);
     }
 
     @Test
     void addTicketToOrderSeatAlreadyTaken() {
-        TicketRequestDto ticketDto = sampleTicketRequestDto();
-        Order order = sampleOrder();
+        final TicketRequestDto ticketDto = sampleTicketRequestDto();
+        final Order order = sampleOrder();
+        final UUID orderId = sampleOrderId();
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
         when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(sampleEvent()));
         when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(sampleSeat()));
         when(ticketRepository.existsByEventIdAndSeatId(sampleEventId(), sampleSeatId())).thenReturn(true);
 
-        assertThatThrownBy(() -> orderService.addTicketToOrder(sampleOrderId(), ticketDto))
+        assertThatThrownBy(() -> orderService.addTicketToOrder(orderId, ticketDto))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Seat is already reserved");
     }
 
     @Test
     void removeTicketFromOrderSuccess() {
-        Order order = sampleOrder();
-        Ticket ticket = sampleTicket();
+        final Order order = sampleOrder();
+        final Ticket ticket = sampleTicket();
         order.addTicket(ticket);
-        Order savedOrder = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
+        final Order savedOrder = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
         when(orderRepository.save(order)).thenReturn(savedOrder);
         when(orderMapper.toDto(savedOrder)).thenReturn(response);
 
-        OrderResponseDto result = orderService.removeTicketFromOrder(sampleOrderId(), sampleTicketId());
+        final OrderResponseDto result = orderService.removeTicketFromOrder(sampleOrderId(), sampleTicketId());
 
         assertThat(result).isEqualTo(response);
         verify(cacheService).evictByPattern(OrderServiceImpl.ORDERS_BY_VENUE);
@@ -573,31 +582,36 @@ class OrderServiceTest {
 
     @Test
     void removeTicketFromOrderOrderNotFound() {
+        final UUID orderId = sampleOrderId();
+        final UUID ticketId = sampleTicketId();
+
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.removeTicketFromOrder(sampleOrderId(), sampleTicketId()))
+        assertThatThrownBy(() -> orderService.removeTicketFromOrder(orderId, ticketId))
                 .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
     void removeTicketFromOrderTicketNotFound() {
-        Order order = sampleOrder();
+        final Order order = sampleOrder();
+        final UUID orderId = sampleOrderId();
+        final UUID ticketId = sampleTicketId();
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
 
-        assertThatThrownBy(() -> orderService.removeTicketFromOrder(sampleOrderId(), sampleTicketId()))
+        assertThatThrownBy(() -> orderService.removeTicketFromOrder(orderId, ticketId))
                 .isInstanceOf(TicketNotFoundException.class);
     }
 
     @Test
     void softDeleteOrderByIdSuccess() {
-        Order order = sampleOrder();
-        OrderResponseDto response = sampleOrderResponseDto();
+        final Order order = sampleOrder();
+        final OrderResponseDto response = sampleOrderResponseDto();
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
         when(orderMapper.toDto(order)).thenReturn(response);
 
-        OrderResponseDto result = orderService.softDeleteOrderById(sampleOrderId());
+        final OrderResponseDto result = orderService.softDeleteOrderById(sampleOrderId());
 
         assertThat(result).isEqualTo(response);
         assertThat(order.isDeleted()).isTrue();
@@ -606,15 +620,17 @@ class OrderServiceTest {
 
     @Test
     void softDeleteOrderByIdNotFound() {
+        final UUID orderId = sampleOrderId();
+
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.softDeleteOrderById(sampleOrderId()))
+        assertThatThrownBy(() -> orderService.softDeleteOrderById(orderId))
                 .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
     void deleteOrderByIdSuccess() {
-        Order order = sampleOrder();
+        final Order order = sampleOrder();
 
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.of(order));
 
@@ -626,9 +642,11 @@ class OrderServiceTest {
 
     @Test
     void deleteOrderByIdNotFound() {
+        final UUID orderId = sampleOrderId();
+
         when(orderRepository.findById(sampleOrderId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.deleteOrderById(sampleOrderId()))
+        assertThatThrownBy(() -> orderService.deleteOrderById(orderId))
                 .isInstanceOf(OrderNotFoundException.class);
     }
 }
