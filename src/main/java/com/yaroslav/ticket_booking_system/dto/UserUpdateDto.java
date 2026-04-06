@@ -1,5 +1,6 @@
 package com.yaroslav.ticket_booking_system.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Request object for updating user information")
 public class UserUpdateDto {
 
     @Size(min = 1, max = 100)

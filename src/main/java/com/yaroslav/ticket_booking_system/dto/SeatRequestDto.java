@@ -1,5 +1,6 @@
 package com.yaroslav.ticket_booking_system.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Request object for creating a new seat")
 public class SeatRequestDto {
 
     @NotNull

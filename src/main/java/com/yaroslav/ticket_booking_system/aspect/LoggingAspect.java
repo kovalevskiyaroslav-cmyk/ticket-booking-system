@@ -59,10 +59,9 @@ public class LoggingAspect {
         }
 
         final long startTime = System.nanoTime();
-        final Object result;
 
         try {
-            result = joinPoint.proceed();
+            Object result = joinPoint.proceed();
 
             final long executionTimeMs = (System.nanoTime() - startTime) / 1_000_000;
 
@@ -84,7 +83,11 @@ public class LoggingAspect {
 
             return result;
         } catch (Exception e) {
-            log.error("Error in {}.{}: {} - {}", className, methodName, e.getClass().getSimpleName(), e.getMessage(), e);
+            log.error("Error in {}.{}: {} - {}",
+                    className,
+                    methodName,
+                    e.getClass().getSimpleName(),
+                    e.getMessage());
             throw e;
         }
     }

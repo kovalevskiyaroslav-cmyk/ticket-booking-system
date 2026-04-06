@@ -1,5 +1,6 @@
 package com.yaroslav.ticket_booking_system.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Request object for updating an existing event")
 public class EventUpdateDto {
 
     @Size(min = 1, max = 200)

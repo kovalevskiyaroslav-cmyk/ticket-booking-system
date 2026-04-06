@@ -6,6 +6,8 @@ import com.yaroslav.ticket_booking_system.dto.OrderUpdateDto;
 import com.yaroslav.ticket_booking_system.dto.TicketRequestDto;
 import com.yaroslav.ticket_booking_system.model.OrderStatus;
 import com.yaroslav.ticket_booking_system.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -31,11 +33,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
+@Tag(name = "Order Management", description = "APIs for managing orders in the ticket booking system")
 public class OrderController {
 
     private final OrderService orderService;
 
     @PostMapping
+    @Operation(summary = "Create a new order", description = "Creates a new order with selected tickets for a user")
     public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto requestDto) {
 
         final OrderResponseDto created = orderService.createOrder(requestDto);
@@ -44,6 +48,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get order by ID", description = "Retrieves detailed information about a specific order")
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable UUID id) {
 
         final OrderResponseDto order = orderService.getOrderById(id);
@@ -52,6 +57,7 @@ public class OrderController {
     }
 
     @GetMapping("/status/{orderStatus}")
+    @Operation(summary = "Get orders by status", description = "Retrieves all orders with a specific status (CREATED, PAID, CANCELLED, REFUNDED)")
     public ResponseEntity<List<OrderResponseDto>> getOrdersByStatus(@PathVariable OrderStatus orderStatus) {
 
         final List<OrderResponseDto> orders = orderService.getOrdersByStatus(orderStatus);
@@ -60,6 +66,7 @@ public class OrderController {
     }
 
     @GetMapping("/deleted/{deleted}")
+    @Operation(summary = "Get orders by deleted flag", description = "Retrieves orders based on soft-delete status")
     public ResponseEntity<List<OrderResponseDto>> getOrdersByDeleted(@PathVariable Boolean deleted) {
 
         final List<OrderResponseDto> orders = orderService.getOrdersByDeleted(deleted);
@@ -68,6 +75,7 @@ public class OrderController {
     }
 
     @GetMapping("/by-date")
+    @Operation(summary = "Get orders by completion date range", description = "Retrieves orders completed between two dates")
     public ResponseEntity<List<OrderResponseDto>> getOrdersByDateTimeBetween(
             @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam("after") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
@@ -78,6 +86,7 @@ public class OrderController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all orders", description = "Retrieves a list of all orders in the system")
     public ResponseEntity<List<OrderResponseDto>> getAllOrders() {
 
         final List<OrderResponseDto> orders = orderService.getAllOrders();
@@ -86,6 +95,7 @@ public class OrderController {
     }
 
     @GetMapping("/by-venue/{name}")
+    @Operation(summary = "Get orders by venue name", description = "Retrieves paginated orders for a specific venue")
     public ResponseEntity<Page<OrderResponseDto>> getOrdersByVenueName(
             @PathVariable String name,
             @ParameterObject Pageable pageable) {
@@ -94,6 +104,7 @@ public class OrderController {
     }
 
     @PatchMapping("/add/{id}")
+    @Operation(summary = "Add ticket to order", description = "Adds a ticket to an existing order")
     public ResponseEntity<OrderResponseDto> addTicketToOrder(
             @PathVariable UUID id,
             @Valid @RequestBody TicketRequestDto requestDto) {
@@ -104,6 +115,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}/tickets/{ticketId}")
+    @Operation(summary = "Remove ticket from order", description = "Removes a ticket from an existing order")
     public ResponseEntity<OrderResponseDto> removeTicketFromOrder(@PathVariable UUID id, @PathVariable UUID ticketId) {
 
         final OrderResponseDto order = orderService.removeTicketFromOrder(id, ticketId);
@@ -112,6 +124,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Update order by ID", description = "Updates order status or completion date")
     public ResponseEntity<OrderResponseDto> updateOrderById(
             @PathVariable UUID id,
             @Valid @RequestBody OrderUpdateDto updateDto) {
@@ -122,6 +135,7 @@ public class OrderController {
     }
 
     @PatchMapping("/delete/{id}")
+    @Operation(summary = "Soft delete order by ID", description = "Soft deletes an order (marks as deleted without removing from database)")
     public ResponseEntity<OrderResponseDto> softDeleteOrderById(@PathVariable UUID id) {
 
         final OrderResponseDto order = orderService.softDeleteOrderById(id);
@@ -130,6 +144,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Hard delete order by ID", description = "Permanently deletes an order from the database")
     public ResponseEntity<Void> deleteOrderById(@PathVariable UUID id) {
 
         orderService.deleteOrderById(id);

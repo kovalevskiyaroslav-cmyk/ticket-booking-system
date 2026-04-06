@@ -4,6 +4,8 @@ import com.yaroslav.ticket_booking_system.dto.UserRequestDto;
 import com.yaroslav.ticket_booking_system.dto.UserResponseDto;
 import com.yaroslav.ticket_booking_system.dto.UserUpdateDto;
 import com.yaroslav.ticket_booking_system.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,11 +25,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Tag(name = "User Management", description = "APIs for managing users in the ticket booking system")
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping
+    @Operation(summary = "Create a new user", description = "Registers a new user with name, email, and phone number")
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto requestDto) {
 
         final UserResponseDto created = userService.createUser(requestDto);
@@ -36,6 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get user by ID", description = "Retrieves detailed information about a specific user")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {
 
         final UserResponseDto user = userService.getUserById(id);
@@ -44,6 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/name/{name}")
+    @Operation(summary = "Get user by name", description = "Retrieves user information by their full name")
     public ResponseEntity<UserResponseDto> getUserByName(@PathVariable String name) {
 
         final UserResponseDto user = userService.getUserByName(name);
@@ -52,6 +58,7 @@ public class UserController {
     }
 
     @GetMapping("/phone/{phone}")
+    @Operation(summary = "Get user by phone", description = "Retrieves user information by phone number")
     public ResponseEntity<UserResponseDto> getUserByPhone(@PathVariable String phone) {
 
         final UserResponseDto user = userService.getUserByPhone(phone);
@@ -60,6 +67,7 @@ public class UserController {
     }
 
     @GetMapping("/email/{email}")
+    @Operation(summary = "Get user by email", description = "Retrieves user information by email address")
     public ResponseEntity<UserResponseDto> getUserByEmail(@PathVariable String email) {
 
         final UserResponseDto user = userService.getUserByEmail(email);
@@ -68,6 +76,7 @@ public class UserController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all users", description = "Retrieves a list of all users in the system")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
 
         final List<UserResponseDto> users = userService.getAllUsers();
@@ -76,6 +85,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/events/{eventId}")
+    @Operation(summary = "Add favorite event to user", description = "Adds an event to user's favorites list")
     public ResponseEntity<UserResponseDto> addFavoriteEventToUser(@PathVariable UUID id, @PathVariable UUID eventId) {
 
         final UserResponseDto user = userService.addFavoriteEventToUser(id, eventId);
@@ -84,6 +94,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/events/{eventId}")
+    @Operation(summary = "Remove favorite event from user", description = "Removes an event from user's favorites list")
     public ResponseEntity<UserResponseDto> removeFavoriteEventFromUser(
             @PathVariable UUID id,
             @PathVariable UUID eventId) {
@@ -94,6 +105,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Update user by ID", description = "Updates user information (name, email, phone)")
     public ResponseEntity<UserResponseDto> updateUserById(
             @PathVariable UUID id,
             @Valid @RequestBody UserUpdateDto updateDto) {
@@ -104,6 +116,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user by ID", description = "Permanently deletes a user (only if no active orders)")
     public ResponseEntity<Void> deleteUserById(@PathVariable UUID id) {
 
         userService.deleteUserById(id);

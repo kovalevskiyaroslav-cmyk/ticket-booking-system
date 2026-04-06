@@ -1,5 +1,6 @@
 package com.yaroslav.ticket_booking_system.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Request object for creating or updating an event")
 public class EventRequestDto {
 
     @NotBlank

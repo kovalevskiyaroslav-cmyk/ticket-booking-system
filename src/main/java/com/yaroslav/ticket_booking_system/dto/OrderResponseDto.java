@@ -1,6 +1,7 @@
 package com.yaroslav.ticket_booking_system.dto;
 
 import com.yaroslav.ticket_booking_system.model.OrderStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Response object containing order details")
 public class OrderResponseDto {
     private UUID id;
     private LocalDateTime completedAt;

@@ -4,6 +4,8 @@ import com.yaroslav.ticket_booking_system.dto.EventRequestDto;
 import com.yaroslav.ticket_booking_system.dto.EventResponseDto;
 import com.yaroslav.ticket_booking_system.dto.EventUpdateDto;
 import com.yaroslav.ticket_booking_system.service.EventService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,11 +28,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
+@Tag(name = "Event Management", description = "APIs for managing events in the ticket booking system")
 public class EventController {
 
     private final EventService eventService;
 
     @PostMapping
+    @Operation(summary = "Create a new event", description = "Creates a new event with venue and date/time information")
     public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto requestDto) {
 
         final EventResponseDto created = eventService.createEvent(requestDto);
@@ -39,6 +43,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get event by ID", description = "Retrieves detailed information about a specific event")
     public ResponseEntity<EventResponseDto> getEventById(@PathVariable UUID id) {
 
         final EventResponseDto event = eventService.getEventById(id);
@@ -47,6 +52,7 @@ public class EventController {
     }
 
     @GetMapping("/name/{name}")
+    @Operation(summary = "Get event by name", description = "Retrieves event information by its name")
     public ResponseEntity<EventResponseDto> getEventByName(@PathVariable String name) {
 
         final EventResponseDto event = eventService.getEventByName(name);
@@ -54,7 +60,14 @@ public class EventController {
         return ResponseEntity.ok(event);
     }
 
+    @GetMapping("/test/500")
+    @Operation(summary = "Test 500 error", description = "Endpoint for testing internal server error handling")
+    public String test500() {
+        throw new RuntimeException("Test 500 error");
+    }
+
     @GetMapping("/by-date")
+    @Operation(summary = "Get events by date range", description = "Retrieves all events occurring between two dates")
     public ResponseEntity<List<EventResponseDto>> getEventsByDateTimeBetween(
             @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam("after") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
@@ -65,6 +78,7 @@ public class EventController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all events", description = "Retrieves a list of all events in the system")
     public ResponseEntity<List<EventResponseDto>> getAllEvents() {
 
         final List<EventResponseDto> events = eventService.getAllEvents();
@@ -73,6 +87,7 @@ public class EventController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Update event by ID", description = "Updates event information (name, description, date/time, venue)")
     public ResponseEntity<EventResponseDto> updateEventById(@PathVariable UUID id, @Valid @RequestBody EventUpdateDto updateDto) {
 
         final EventResponseDto event = eventService.updateById(id, updateDto);
@@ -81,6 +96,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete event by ID", description = "Permanently deletes an event (only if no tickets are sold)")
     ResponseEntity<Void> deleteEventById(@PathVariable UUID id) {
 
         eventService.deleteById(id);
