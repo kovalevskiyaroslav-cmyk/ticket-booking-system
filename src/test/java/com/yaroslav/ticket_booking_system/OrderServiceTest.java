@@ -46,6 +46,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -253,22 +254,24 @@ class OrderServiceTest {
     void createOrdersBulkSuccess() {
         final List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
         final User user = sampleUser();
-        final Order savedOrder = sampleOrder();
-        final OrderResponseDto response = sampleOrderResponseDto();
+        final Order savedOrder1 = sampleOrder();
+        final Order savedOrder2 = sampleOrder();
+        final OrderResponseDto response1 = sampleOrderResponseDto();
+        final OrderResponseDto response2 = sampleOrderResponseDto();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
-        when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
-        when(ticketRepository.existsByEventIdAndSeatId(any(), any())).thenReturn(false);
-        when(eventRepository.findById(any())).thenReturn(Optional.of(sampleEvent()));
-        when(seatRepository.findById(any())).thenReturn(Optional.of(sampleSeat()));
-        when(orderRepository.save(savedOrder)).thenReturn(savedOrder);
-        when(orderMapper.toDto(savedOrder)).thenReturn(response);
+        when(orderRepository.saveAll(anyCollection())).thenReturn(List.of(savedOrder1, savedOrder2));
+        when(ticketRepository.existsByEventIdAndSeatId(sampleEventId(), sampleSeatId())).thenReturn(false);
+        when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(sampleEvent()));
+        when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(sampleSeat()));
+        when(orderMapper.toDto(savedOrder1)).thenReturn(response1);
+        when(orderMapper.toDto(savedOrder2)).thenReturn(response2);
 
         final List<OrderResponseDto> result = orderService.createOrdersBulk(requests);
 
         assertThat(result).hasSize(2);
-        assertThat(result.get(0)).isEqualTo(response);
-        assertThat(result.get(1)).isEqualTo(response);
+        assertThat(result.get(0)).isEqualTo(response1);
+        assertThat(result.get(1)).isEqualTo(response2);
         verify(cacheService).evictByPattern(OrderServiceImpl.ORDERS_BY_VENUE);
     }
 
@@ -284,20 +287,56 @@ class OrderServiceTest {
     }
 
     @Test
-    void createOrdersBulkSecondOrderFailsWithDuplicateTicket() {
+    void createOrdersBulkDuplicateTicket() {
         final List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
         final User user = sampleUser();
 
         when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
-        when(orderRepository.save(any(Order.class))).thenReturn(sampleOrder());
-        when(ticketRepository.existsByEventIdAndSeatId(any(), any()))
+        when(ticketRepository.existsByEventIdAndSeatId(sampleEventId(), sampleSeatId()))
                 .thenReturn(false)
                 .thenReturn(true);
-        when(eventRepository.findById(any())).thenReturn(Optional.of(sampleEvent()));
-        when(seatRepository.findById(any())).thenReturn(Optional.of(sampleSeat()));
+        when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(sampleEvent()));
+        when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(sampleSeat()));
 
         assertThatThrownBy(() -> orderService.createOrdersBulk(requests))
                 .isInstanceOf(DuplicateTicketException.class);
+    }
+
+    @Test
+    void createOrdersBulkUserNotFound() {
+        final List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
+
+        when(userRepository.findById(sampleUserId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.createOrdersBulk(requests))
+                .isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void createOrdersBulkEventNotFound() {
+        final List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
+        final User user = sampleUser();
+
+        when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
+        when(ticketRepository.existsByEventIdAndSeatId(sampleEventId(), sampleSeatId())).thenReturn(false);
+        when(eventRepository.findById(sampleEventId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.createOrdersBulk(requests))
+                .isInstanceOf(EventNotFoundException.class);
+    }
+
+    @Test
+    void createOrdersBulkSeatNotFound() {
+        final List<OrderRequestDto> requests = List.of(sampleOrderRequestDto(), sampleOrderRequestDto());
+        final User user = sampleUser();
+
+        when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
+        when(ticketRepository.existsByEventIdAndSeatId(sampleEventId(), sampleSeatId())).thenReturn(false);
+        when(eventRepository.findById(sampleEventId())).thenReturn(Optional.of(sampleEvent()));
+        when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.createOrdersBulk(requests))
+                .isInstanceOf(SeatNotFoundException.class);
     }
 
     @Test

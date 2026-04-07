@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -58,16 +57,14 @@ public class OrderServiceImpl implements OrderService {
     public static final String ORDERS_BY_VENUE = "getOrdersByVenue";
     public static final String CACHE_HIT = "[CACHE HIT] ";
 
-    private OrderResponseDto createSingleOrder(OrderRequestDto requestDto) {
+    private Order createAndPopulateOrder(OrderRequestDto requestDto) {
         final User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException(requestDto.getUserId()));
 
         final Order order = new Order(user);
-        final Order savedOrder = orderRepository.save(order);
 
         if (requestDto.getTicketDtos() != null && !requestDto.getTicketDtos().isEmpty()) {
             for (TicketRequestDto ticketDto : requestDto.getTicketDtos()) {
-
                 final boolean seatTaken = ticketRepository.existsByEventIdAndSeatId(
                         ticketDto.getEventId(),
                         ticketDto.getSeatId()
@@ -78,7 +75,6 @@ public class OrderServiceImpl implements OrderService {
 
                 final Event event = eventRepository.findById(ticketDto.getEventId())
                         .orElseThrow(() -> new EventNotFoundException(ticketDto.getEventId()));
-
                 final Seat seat = seatRepository.findById(ticketDto.getSeatId())
                         .orElseThrow(() -> new SeatNotFoundException(ticketDto.getSeatId()));
 
@@ -86,25 +82,28 @@ public class OrderServiceImpl implements OrderService {
                 ticket.setEvent(event);
                 ticket.setSeat(seat);
                 ticket.setPrice(seat.getPrice());
-
-                savedOrder.addTicket(ticket);
-
-                ticketRepository.save(ticket);
+                order.addTicket(ticket);
             }
         }
 
         final Payment payment = new Payment();
-        payment.setAmount(savedOrder.getTotalPrice());
+        payment.setAmount(order.getTotalPrice());
         payment.setStatus(PaymentStatus.PENDING);
-        savedOrder.setPayment(payment);
+        order.setPayment(payment);
 
-        return orderMapper.toDto(orderRepository.save(savedOrder));
+        return order;
+    }
+
+    private OrderResponseDto saveAndMapSingleOrder(OrderRequestDto requestDto) {
+        final Order order = createAndPopulateOrder(requestDto);
+        final Order savedOrder = orderRepository.save(order);
+        return orderMapper.toDto(savedOrder);
     }
 
     @Override
     @Transactional
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
-        final OrderResponseDto createdOrder = createSingleOrder(requestDto);
+        final OrderResponseDto createdOrder = saveAndMapSingleOrder(requestDto);
         cacheService.evictByPattern(ORDERS_BY_VENUE);
         return createdOrder;
     }
@@ -116,16 +115,17 @@ public class OrderServiceImpl implements OrderService {
             return Collections.emptyList();
         }
 
-        final List<OrderResponseDto> responses = new ArrayList<>();
+        final List<Order> orders = requestDtos.stream()
+                .map(this::createAndPopulateOrder)
+                .toList();
 
-        for (OrderRequestDto requestDto : requestDtos) {
-            final OrderResponseDto createdOrder = createSingleOrder(requestDto);
-            responses.add(createdOrder);
-        }
+        final List<Order> savedOrders = orderRepository.saveAll(orders);
 
         cacheService.evictByPattern(ORDERS_BY_VENUE);
 
-        return responses;
+        return savedOrders.stream()
+                .map(orderMapper::toDto)
+                .toList();
     }
 
     @Override
