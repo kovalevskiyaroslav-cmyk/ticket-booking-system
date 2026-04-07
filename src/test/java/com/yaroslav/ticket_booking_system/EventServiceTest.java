@@ -310,6 +310,23 @@ class EventServiceTest {
     }
 
     @Test
+    void updateByIdNameSameAsExistingShouldNotCheckDuplicate() {
+        final UUID eventId = sampleEventId();
+
+        final EventUpdateDto updateDto = new EventUpdateDto();
+        updateDto.setName("Legends of Rock Live");
+
+        final Event existingEvent = sampleEvent();
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
+        when(eventMapper.toDto(existingEvent)).thenReturn(sampleResponseDto());
+
+        eventService.updateById(eventId, updateDto);
+
+        verify(eventRepository, never()).existsByName(any());
+    }
+
+    @Test
     void deleteByIdSuccess() {
         final UUID eventId = sampleEventId();
         final Event event = sampleEvent();

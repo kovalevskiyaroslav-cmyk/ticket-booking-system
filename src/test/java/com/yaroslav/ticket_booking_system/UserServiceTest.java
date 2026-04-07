@@ -28,6 +28,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -444,21 +445,52 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUserByIdDuplicatePhone() {
+    void updateUserByIdPhoneConflictWithAnotherUser() {
+        final UUID userId = sampleUserId();
+        final UUID otherUserId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
         final UserUpdateDto updateDto = new UserUpdateDto();
-        updateDto.setPhone("+12125550999");
+        updateDto.setPhone("+1234567890");
+        updateDto.setEmail(null);
 
         final User user = sampleUser();
-        final User existingUser = new User();
-        existingUser.setId(UUID.randomUUID());
-        existingUser.setPhone("+12125550999");
-        final UUID userId = sampleUserId();
+        user.setId(userId);
+        user.setPhone("old@phone.com");
+        user.setEmail("old@email.com");
 
-        when(userRepository.findById(sampleUserId())).thenReturn(Optional.of(user));
-        when(userRepository.findByPhone("+12125550999")).thenReturn(Optional.of(existingUser));
+        final User existingUser = new User();
+        existingUser.setId(otherUserId);
+        existingUser.setPhone("+1234567890");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByPhone("+1234567890")).thenReturn(Optional.of(existingUser));
 
         assertThatThrownBy(() -> userService.updateUserById(userId, updateDto))
                 .isInstanceOf(DuplicatePhoneException.class);
+
+        verify(userRepository, never()).save(any());
+        verify(userRepository, never()).findByEmail(anyString());
+    }
+
+    @Test
+    void updateUserByIdPhoneSameUserNoConflict() {
+        final UUID userId = sampleUserId();
+
+        final UserUpdateDto updateDto = new UserUpdateDto();
+        updateDto.setPhone("+1234567890");
+
+        final User user = sampleUser();
+        user.setId(userId);
+
+        final User existingUser = new User();
+        existingUser.setId(userId);
+        existingUser.setPhone("+1234567890");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByPhone("+1234567890")).thenReturn(Optional.of(existingUser));
+
+        userService.updateUserById(userId, updateDto);
+
+        assertThat(user.getPhone()).isEqualTo("+1234567890");
     }
 
     @Test

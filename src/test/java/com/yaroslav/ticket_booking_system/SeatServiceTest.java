@@ -338,6 +338,25 @@ class SeatServiceTest {
     }
 
     @Test
+    void updateSeatByIdPriceNotUpdatedWhenNull() {
+        final SeatUpdateDto updateDto = new SeatUpdateDto();
+        updateDto.setNumber(5);
+        updateDto.setPrice(null);
+
+        final Seat seat = sampleSeat();
+        final BigDecimal originalPrice = seat.getPrice();
+
+        final SeatResponseDto response = sampleResponseDto();
+
+        when(seatRepository.findById(sampleSeatId())).thenReturn(Optional.of(seat));
+        when(seatMapper.toDto(seat)).thenReturn(response);
+
+        seatService.updateSeatById(sampleSeatId(), updateDto);
+
+        assertThat(seat.getPrice()).isEqualTo(originalPrice);
+    }
+
+    @Test
     void deleteSeatByIdSuccess() {
         final Seat seat = sampleSeat();
 
