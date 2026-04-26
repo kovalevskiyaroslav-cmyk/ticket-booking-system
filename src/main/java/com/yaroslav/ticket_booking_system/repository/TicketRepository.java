@@ -24,7 +24,6 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     @EntityGraph(attributePaths = {"event", "order", "seat"})
     List<Ticket> findAllByEventId(UUID id);
 
-    @EntityGraph(attributePaths = {"event", "order", "seat"})
     @Query(value = """
         SELECT t.*
         FROM tickets t

@@ -261,6 +261,10 @@ public class OrderServiceImpl implements OrderService {
 
         order.addTicket(ticket);
 
+        if (order.getPayment() != null) {
+            order.getPayment().setAmount(order.getTotalPrice());
+        }
+
         return getOrderResponseDtoWithCacheEviction(order);
     }
 
@@ -279,6 +283,10 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
         order.removeTicket(ticket);
+
+        if (order.getPayment() != null) {
+            order.getPayment().setAmount(order.getTotalPrice());
+        }
 
         return getOrderResponseDtoWithCacheEviction(order);
     }

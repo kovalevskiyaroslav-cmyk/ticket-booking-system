@@ -1,21 +1,31 @@
 package com.yaroslav.ticket_booking_system.service.impl;
 
 import com.yaroslav.ticket_booking_system.service.RaceConditionService;
+import com.yaroslav.ticket_booking_system.service.SafeCounterService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class RaceConditionServiceImpl implements RaceConditionService {
 
+    private final SafeCounterService safeCounterService;
+
+    @Autowired
+    public RaceConditionServiceImpl(SafeCounterService safeCounterService) {
+        this.safeCounterService = safeCounterService;
+    }
+
     @Override
     public String demonstrate(int threads, int increments) {
+        safeCounterService.reset();
+
         if (threads <= 0) {
             return String.format(
                     "Threads: %d, Increments per thread: %d " +
@@ -29,7 +39,6 @@ public class RaceConditionServiceImpl implements RaceConditionService {
         }
 
         final UnsafeCounter unsafeCounter = new UnsafeCounter();
-        final SafeCounter safeCounter = new SafeCounter();
 
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
@@ -39,7 +48,7 @@ public class RaceConditionServiceImpl implements RaceConditionService {
             executor.submit(() -> {
                 for (int j = 0; j < increments; j++) {
                     unsafeCounter.increment();
-                    safeCounter.increment();
+                    safeCounterService.increment();
                 }
             });
         }
@@ -63,7 +72,7 @@ public class RaceConditionServiceImpl implements RaceConditionService {
                         "Conclusion: Race condition causes data loss. AtomicInteger provides thread-safe operations.",
                 threads, increments, expected,
                 unsafeCounter.getValue(), expected - unsafeCounter.getValue(),
-                safeCounter.getValue(), duration
+                safeCounterService.getValue(), duration
         );
     }
 
@@ -73,19 +82,6 @@ public class RaceConditionServiceImpl implements RaceConditionService {
 
         public void increment() {
             value++;
-        }
-
-    }
-
-    static class SafeCounter {
-        private final AtomicInteger value = new AtomicInteger(0);
-
-        public void increment() {
-            value.incrementAndGet();
-        }
-
-        public int getValue() {
-            return value.get();
         }
     }
 }
