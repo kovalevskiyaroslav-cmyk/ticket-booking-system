@@ -1,4 +1,3 @@
-// Базовые типы, используемые во всем приложении
 export type UUID = string;
 
 export interface Pageable {

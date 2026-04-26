@@ -3,7 +3,7 @@ import { UUID } from './common';
 export interface SeatRequest {
     number: number;
     section: number;
-    price: number; // BigDecimal как number
+    price: number;
     venueId: UUID;
 }
 

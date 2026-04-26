@@ -3,7 +3,7 @@ import { UUID } from './common';
 export interface EventRequest {
     name: string;
     description?: string;
-    dateTime: string; // ISO DateTime
+    dateTime: string;
     venueId: UUID;
 }
 

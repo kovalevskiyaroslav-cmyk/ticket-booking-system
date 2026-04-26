@@ -24,7 +24,7 @@ export const useEvents = () => {
             queryKey: ['events', 'name', name],
             queryFn: () => eventApi.getByName(name),
             enabled: false,
-            retry: false, // ← Отключаем повторные попытки
+            retry: false,
         });
 
     const useEventsByDateRange = (start: string, end: string) =>
@@ -32,7 +32,7 @@ export const useEvents = () => {
             queryKey: ['events', 'dateRange', start, end],
             queryFn: () => eventApi.getByDateRange(start, end),
             enabled: false,
-            retry: false, // ← Отключаем повторные попытки
+            retry: false,
         });
 
     const useCreateEvent = () =>

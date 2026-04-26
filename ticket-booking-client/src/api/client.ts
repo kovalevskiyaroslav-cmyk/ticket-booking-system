@@ -10,10 +10,8 @@ const apiClient: AxiosInstance = axios.create({
     timeout: 10000,
 });
 
-// Интерцептор запросов
 apiClient.interceptors.request.use(
     (config) => {
-        // Здесь можно добавить токен авторизации, если нужен
         const token = localStorage.getItem('auth_token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -23,7 +21,6 @@ apiClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Интерцептор ответов
 apiClient.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {

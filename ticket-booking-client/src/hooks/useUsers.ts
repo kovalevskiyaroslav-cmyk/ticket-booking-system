@@ -56,7 +56,6 @@ export const useUsers = () => {
             mutationFn: ({ id, data }: { id: UUID; data: UserUpdate }) =>
                 userApi.update(id, data),
             onSuccess: (_, variables) => {
-                // Инвалидируем только конкретного пользователя
                 queryClient.invalidateQueries({ queryKey: ['users', variables.id] });
             },
         });

@@ -24,7 +24,7 @@ export const useVenues = () => {
             queryKey: ['venues', 'name', name],
             queryFn: () => venueApi.getByName(name),
             enabled: false,
-            retry: false, // ← Отключаем повторные попытки
+            retry: false,
         });
 
     const useVenueByAddress = (address: string) =>
@@ -32,7 +32,7 @@ export const useVenues = () => {
             queryKey: ['venues', 'address', address],
             queryFn: () => venueApi.getByAddress(address),
             enabled: false,
-            retry: false, // ← Отключаем повторные попытки
+            retry: false,
         });
 
     const useCreateVenue = () =>
