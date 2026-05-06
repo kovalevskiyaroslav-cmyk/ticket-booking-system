@@ -48,21 +48,55 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys
 
-      - name: Wait for deployment
-        run: sleep 60
+      - name: Wait for Render deployment
+        run: |
+          echo "Waiting for Render deployment to complete..."
+          sleep 120
+          
+          MAX_RETRIES=20
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            STATUS=$(curl -s \
+              -H "Accept: application/json" \
+              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+              https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys | \
+              jq -r '.[0].status')
+          
+            echo "Deployment status: $STATUS"
+          
+            if [ "$STATUS" = "live" ]; then
+              echo "Deployment is live!"
+              exit 0
+            elif [ "$STATUS" = "failed" ]; then
+              echo "Deployment failed!"
+              exit 1
+            fi
+          
+            sleep 15
+            RETRY_COUNT=$((RETRY_COUNT+1))
+          done
+          
+          echo "Timeout waiting for deployment"
+          exit 1
 
       - name: Healthcheck
         run: |
-          MAX_RETRIES=10
+          echo "Running healthcheck..."
+          sleep 10
+          
+          MAX_RETRIES=15
           RETRY_COUNT=0
+          
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             if curl -f https://${{ secrets.RENDER_SERVICE_NAME }}.onrender.com/actuator/health; then
-              echo "Healthcheck passed"
+              echo "Healthcheck passed!"
               exit 0
             fi
-            echo "Healthcheck failed, retrying in 10 seconds..."
+            echo "Healthcheck failed, retrying in 10 seconds... (Attempt $((RETRY_COUNT+1))/$MAX_RETRIES)"
             sleep 10
             RETRY_COUNT=$((RETRY_COUNT+1))
           done
+          
           echo "Healthcheck failed after $MAX_RETRIES attempts"
           exit 1
