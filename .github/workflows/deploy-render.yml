@@ -53,7 +53,7 @@ jobs:
           echo "Waiting for Render deployment to complete..."
           sleep 120
           
-          MAX_RETRIES=20
+          MAX_RETRIES=40
           RETRY_COUNT=0
           
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
