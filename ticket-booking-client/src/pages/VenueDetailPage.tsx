@@ -113,7 +113,6 @@ export const VenueDetailPage = () => {
                     </form>
                 ) : (
                     <div style={{ marginTop: '20px' }}>
-                        <p><strong>ID:</strong> {venue.id}</p>
                         <p><strong>Address:</strong> {venue.address}</p>
                     </div>
                 )}

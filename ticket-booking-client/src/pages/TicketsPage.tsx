@@ -131,23 +131,27 @@ export const TicketsPage = () => {
                 <table>
                     <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Price</th>
                         <th>Seat</th>
                         <th>Event</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     {displayTickets.map(ticket => (
                         <tr key={ticket.id}>
-                            <td>
-                                <Link to={`/tickets/${ticket.id}`} style={{ color: '#007bff', textDecoration: 'none' }}>
-                                    {ticket.id.substring(0, 8)}...
-                                </Link>
-                            </td>
                             <td>{ticket.price} ₽</td>
                             <td><SeatNumber seatId={ticket.seatId} /></td>
                             <td><EventName eventId={ticket.eventId} /></td>
+                            <td>
+                                <Link
+                                    to={`/tickets/${ticket.id}`}
+                                    className="btn btn-primary"
+                                    style={{ padding: '4px 8px', fontSize: '13px', textDecoration: 'none', display: 'inline-block' }}
+                                >
+                                    View
+                                </Link>
+                            </td>
                         </tr>
                     ))}
                     </tbody>

@@ -1,10 +1,23 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useUsers } from '../hooks/useUsers';
+import { useEvents } from '../hooks/useEvents';
 import { UserUpdate } from '../types/user';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { UUID } from '../types/common';
+import { EventSelect } from '../components/EntitySelect';
+
+const EventNameBadge = ({ eventId }: { eventId: UUID }) => {
+    const { useEventById } = useEvents();
+    const { data: event, isLoading } = useEventById(eventId);
+    if (isLoading) return <span>Loading...</span>;
+    return (
+        <Link to={`/events/${eventId}`} style={{ color: '#007bff', textDecoration: 'none' }}>
+            {event?.name || eventId.substring(0, 8) + '...'}
+        </Link>
+    );
+};
 
 export const UserDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -142,7 +155,6 @@ export const UserDetailPage = () => {
                     </form>
                 ) : (
                     <div style={{ marginTop: '20px' }}>
-                        <p><strong>ID:</strong> {user.id}</p>
                         <p><strong>Email:</strong> {user.email}</p>
                         <p><strong>Phone:</strong> {user.phone}</p>
                         <p><strong>Orders count:</strong> {user.orderIds.length}</p>
@@ -157,7 +169,12 @@ export const UserDetailPage = () => {
 
                 <form onSubmit={handleAddFavorite} style={{ display: 'flex', gap: '10px', marginTop: '15px', marginBottom: '20px' }}>
                     <div className="form-group" style={{ flex: 1, margin: 0 }}>
-                        <input className="form-control" value={favoriteEventId} onChange={e => setFavoriteEventId(e.target.value)} placeholder="Event UUID" required />
+                        <EventSelect
+                            value={favoriteEventId}
+                            onChange={id => setFavoriteEventId(id)}
+                            placeholder="Select event"
+                            required
+                        />
                     </div>
                     <button type="submit" className="btn btn-primary">Add</button>
                 </form>
@@ -166,7 +183,7 @@ export const UserDetailPage = () => {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {user.favoriteEventIds.map(eventId => (
                             <div key={eventId} style={{ background: '#f0f0f0', padding: '10px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <Link to={`/events/${eventId}`} style={{ color: '#007bff', textDecoration: 'none' }}>{eventId.substring(0, 8)}...</Link>
+                                <EventNameBadge eventId={eventId} />
                                 <button onClick={() => handleRemoveFavorite(eventId)} className="btn btn-danger" style={{ padding: '2px 8px', fontSize: '12px' }}>×</button>
                             </div>
                         ))}
@@ -180,9 +197,9 @@ export const UserDetailPage = () => {
                 <h2>User orders</h2>
                 {user.orderIds.length > 0 ? (
                     <div style={{ marginTop: '15px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                        {user.orderIds.map(orderId => (
+                        {user.orderIds.map((orderId, index) => (
                             <Link key={orderId} to={`/orders/${orderId}`} style={{ background: '#f0f0f0', padding: '10px', borderRadius: '4px', color: '#007bff', textDecoration: 'none' }}>
-                                {orderId.substring(0, 8)}...
+                                Order #{index + 1}
                             </Link>
                         ))}
                     </div>

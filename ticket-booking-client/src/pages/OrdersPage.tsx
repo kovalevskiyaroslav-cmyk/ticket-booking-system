@@ -8,6 +8,7 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Link } from 'react-router-dom';
 import { UUID } from '../types/common';
+import { UserSelect } from '../components/EntitySelect';
 
 const UserName = ({ userId }: { userId: UUID }) => {
     const { useUserById } = useUsers();
@@ -45,7 +46,7 @@ export const OrdersPage = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
     const [formData, setFormData] = useState({ userId: '' });
-    const [bulkFormData, setBulkFormData] = useState('');
+    const [bulkUsers, setBulkUsers] = useState<string[]>(['']);
 
     const [searchType, setSearchType] = useState<'all' | 'status' | 'deleted' | 'date' | 'venue'>('all');
     const [statusFilter, setStatusFilter] = useState<OrderStatus>(OrderStatus.CREATED);
@@ -90,14 +91,32 @@ export const OrdersPage = () => {
         }
     };
 
+    const addBulkUser = () => {
+        setBulkUsers([...bulkUsers, '']);
+    };
+
+    const removeBulkUser = (index: number) => {
+        setBulkUsers(bulkUsers.filter((_, i) => i !== index));
+    };
+
+    const updateBulkUser = (index: number, userId: string) => {
+        const updated = [...bulkUsers];
+        updated[index] = userId;
+        setBulkUsers(updated);
+    };
+
     const handleBulkCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const userIds = bulkFormData.split(',').map(id => id.trim()).filter(id => id);
-            const ordersData: OrderRequest[] = userIds.map(userId => ({ userId: userId as UUID }));
+            const validUsers = bulkUsers.filter(id => id.trim());
+            if (validUsers.length === 0) {
+                alert('Please select at least one user');
+                return;
+            }
+            const ordersData: OrderRequest[] = validUsers.map(userId => ({ userId: userId as UUID }));
             await createOrdersBulk.mutateAsync(ordersData);
             setIsBulkModalOpen(false);
-            setBulkFormData('');
+            setBulkUsers(['']);
         } catch (err) {
             console.error('Failed to create bulk orders:', err);
         }
@@ -204,7 +223,6 @@ export const OrdersPage = () => {
             <table>
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>User</th>
                     <th>Status</th>
                     <th>Total</th>
@@ -215,11 +233,6 @@ export const OrdersPage = () => {
                 <tbody>
                 {displayOrders?.map(order => (
                     <tr key={order.id}>
-                        <td>
-                            <Link to={`/orders/${order.id}`} style={{ color: '#007bff', textDecoration: 'none' }}>
-                                {order.id.substring(0, 8)}...
-                            </Link>
-                        </td>
                         <td><UserName userId={order.userId} /></td>
                         <td>
                             <select value={order.status} onChange={e => handleStatusChange(order.id, e.target.value as OrderStatus)} className="form-control" style={{ padding: '4px' }}>
@@ -228,13 +241,16 @@ export const OrdersPage = () => {
                                 ))}
                             </select>
                         </td>
-                        <td>
-                            <Link to={`/orders/${order.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                {order.totalPrice} ₽
-                            </Link>
-                        </td>
+                        <td>{order.totalPrice} ₽</td>
                         <td>{order.ticketIds.length}</td>
                         <td>
+                            <Link
+                                to={`/orders/${order.id}`}
+                                className="btn btn-primary"
+                                style={{ padding: '4px 8px', fontSize: '13px', marginRight: '5px', textDecoration: 'none', display: 'inline-block' }}
+                            >
+                                View
+                            </Link>
                             <button
                                 onClick={async () => {
                                     try {
@@ -281,8 +297,13 @@ export const OrdersPage = () => {
             <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create order">
                 <form onSubmit={handleCreate}>
                     <div className="form-group">
-                        <label>User ID *</label>
-                        <input className="form-control" value={formData.userId} onChange={e => setFormData({ userId: e.target.value })} required placeholder="User UUID" />
+                        <label>User *</label>
+                        <UserSelect
+                            value={formData.userId}
+                            onChange={id => setFormData({ userId: id })}
+                            placeholder="Select user"
+                            required
+                        />
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
                         Create
@@ -292,10 +313,30 @@ export const OrdersPage = () => {
 
             <Modal isOpen={isBulkModalOpen} onClose={() => setIsBulkModalOpen(false)} title="Bulk create orders">
                 <form onSubmit={handleBulkCreate}>
-                    <div className="form-group">
-                        <label>User IDs (comma separated) *</label>
-                        <textarea className="form-control" value={bulkFormData} onChange={e => setBulkFormData(e.target.value)} required placeholder="UUID1, UUID2, UUID3" rows={4} />
-                    </div>
+                    <label style={{ fontWeight: 500, marginBottom: '10px', display: 'block' }}>Select users *</label>
+
+                    {bulkUsers.map((userId, index) => (
+                        <div key={index} style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
+                            <div className="form-group" style={{ flex: 1, margin: 0 }}>
+                                <UserSelect
+                                    value={userId}
+                                    onChange={id => updateBulkUser(index, id)}
+                                    placeholder="Select user"
+                                    required
+                                />
+                            </div>
+                            {bulkUsers.length > 1 && (
+                                <button type="button" onClick={() => removeBulkUser(index)} className="btn btn-danger" style={{ padding: '6px 10px' }}>
+                                    ×
+                                </button>
+                            )}
+                        </div>
+                    ))}
+
+                    <button type="button" onClick={addBulkUser} className="btn" style={{ marginBottom: '15px' }}>
+                        + Add another user
+                    </button>
+
                     <button type="submit" className="btn btn-success" style={{ width: '100%' }}>
                         Create orders
                     </button>

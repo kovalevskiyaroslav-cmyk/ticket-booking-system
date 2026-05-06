@@ -1,5 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useTickets } from '../hooks/useTickets';
+import { useEvents } from '../hooks/useEvents';
+import { useSeats } from '../hooks/useSeats';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { UUID } from '../types/common';
@@ -7,8 +9,12 @@ import { UUID } from '../types/common';
 export const TicketDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const { useTicketById } = useTickets();
+    const { useEventById } = useEvents();
+    const { useSeatById } = useSeats();
 
     const { data: ticket, isLoading, error, refetch } = useTicketById(id as UUID);
+    const { data: event } = useEventById(ticket?.eventId || null);
+    const { data: seat } = useSeatById(ticket?.seatId || null);
 
     if (isLoading) return <LoadingSpinner />;
     if (error) return <ErrorMessage message="Error loading ticket" onRetry={refetch} />;
@@ -21,7 +27,7 @@ export const TicketDetailPage = () => {
             </Link>
 
             <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                <h1>Ticket {ticket.id}</h1>
+                <h1>Ticket</h1>
 
                 <div style={{
                     marginTop: '20px',
@@ -52,7 +58,7 @@ export const TicketDetailPage = () => {
                     }}>
                         <p style={{ color: '#004085', fontSize: '13px', marginBottom: '5px' }}>Event</p>
                         <Link to={`/events/${ticket.eventId}`} style={{ color: '#007bff', fontWeight: '500', textDecoration: 'none' }}>
-                            {ticket.eventId.substring(0, 8)}...
+                            {event?.name || 'Loading...'}
                         </Link>
                     </div>
 
@@ -64,7 +70,7 @@ export const TicketDetailPage = () => {
                     }}>
                         <p style={{ color: '#004085', fontSize: '13px', marginBottom: '5px' }}>Seat</p>
                         <Link to={`/seats/${ticket.seatId}`} style={{ color: '#007bff', fontWeight: '500', textDecoration: 'none' }}>
-                            {ticket.seatId.substring(0, 8)}...
+                            {seat ? `№${seat.number}` : 'Loading...'}
                         </Link>
                     </div>
 
@@ -76,7 +82,7 @@ export const TicketDetailPage = () => {
                     }}>
                         <p style={{ color: '#004085', fontSize: '13px', marginBottom: '5px' }}>Order</p>
                         <Link to={`/orders/${ticket.orderId}`} style={{ color: '#007bff', fontWeight: '500', textDecoration: 'none' }}>
-                            {ticket.orderId.substring(0, 8)}...
+                            View order
                         </Link>
                     </div>
                 </div>

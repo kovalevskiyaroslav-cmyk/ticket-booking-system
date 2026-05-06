@@ -1,10 +1,24 @@
 import { useState } from 'react';
 import { useEvents } from '../hooks/useEvents';
+import { useVenues } from '../hooks/useVenues';
 import { EventRequest } from '../types/event';
 import { Modal } from '../components/Modal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Link } from 'react-router-dom';
+import { UUID } from '../types/common';
+import { VenueSelect } from '../components/EntitySelect';
+
+const VenueNameCell = ({ venueId }: { venueId: UUID }) => {
+    const { useVenueById } = useVenues();
+    const { data: venue, isLoading } = useVenueById(venueId);
+    if (isLoading) return <span>Loading...</span>;
+    return (
+        <Link to={`/venues/${venueId}`} style={{ color: '#007bff', textDecoration: 'none' }}>
+            {venue?.name || venueId.substring(0, 8) + '...'}
+        </Link>
+    );
+};
 
 export const EventsPage = () => {
     const { useAllEvents, useEventByName, useEventsByDateRange, useCreateEvent, useDeleteEvent } = useEvents();
@@ -135,6 +149,7 @@ export const EventsPage = () => {
                     <th>Name</th>
                     <th>Description</th>
                     <th>Date and time</th>
+                    <th>Venue</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -148,6 +163,7 @@ export const EventsPage = () => {
                         </td>
                         <td>{event.description?.substring(0, 50) || '—'}{event.description?.length > 50 ? '...' : ''}</td>
                         <td>{new Date(event.dateTime).toLocaleString('en-US')}</td>
+                        <td><VenueNameCell venueId={event.venueId} /></td>
                         <td>
                             <button
                                 onClick={() => deleteEvent.mutate(event.id)}
@@ -193,13 +209,12 @@ export const EventsPage = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Venue ID *</label>
-                        <input
-                            className="form-control"
+                        <label>Venue *</label>
+                        <VenueSelect
                             value={formData.venueId}
-                            onChange={e => setFormData({ ...formData, venueId: e.target.value })}
+                            onChange={id => setFormData({ ...formData, venueId: id })}
+                            placeholder="Select venue"
                             required
-                            placeholder="Venue UUID"
                         />
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>

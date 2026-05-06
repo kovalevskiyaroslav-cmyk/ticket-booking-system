@@ -7,6 +7,7 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Link } from 'react-router-dom';
 import { UUID } from '../types/common';
+import { VenueSelect } from '../components/EntitySelect';
 
 const VenueName = ({ venueId }: { venueId: UUID }) => {
     const { useVenueById } = useVenues();
@@ -119,12 +120,11 @@ export const SeatsPage = () => {
 
                 {(searchType === 'venueNumber' || searchType === 'venueSection') && (
                     <div className="form-group" style={{ margin: 0 }}>
-                        <label>Venue ID</label>
-                        <input
-                            className="form-control"
+                        <label>Venue</label>
+                        <VenueSelect
                             value={venueId}
-                            onChange={e => setVenueId(e.target.value)}
-                            placeholder="Venue UUID"
+                            onChange={id => setVenueId(id)}
+                            placeholder="Select venue"
                         />
                     </div>
                 )}
@@ -256,13 +256,12 @@ export const SeatsPage = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Venue ID *</label>
-                        <input
-                            className="form-control"
+                        <label>Venue *</label>
+                        <VenueSelect
                             value={formData.venueId}
-                            onChange={e => setFormData({ ...formData, venueId: e.target.value })}
+                            onChange={id => setFormData({ ...formData, venueId: id })}
+                            placeholder="Select venue"
                             required
-                            placeholder="Venue UUID"
                         />
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>

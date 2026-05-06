@@ -6,6 +6,7 @@ import { TicketRequest } from '../types/ticket';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { UUID } from '../types/common';
+import { EventSelect, SeatSelect } from '../components/EntitySelect';
 
 export const OrderDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -56,7 +57,7 @@ export const OrderDetailPage = () => {
             </Link>
 
             <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '30px' }}>
-                <h1>Order {order.id}</h1>
+                <h1>Order</h1>
                 <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                     <p><strong>Status:</strong> {order.status}</p>
                     <p><strong>Total:</strong> {order.totalPrice} ₽</p>
@@ -67,7 +68,7 @@ export const OrderDetailPage = () => {
                                 {user.name}
                             </Link>
                         ) : (
-                            order.userId.substring(0, 8) + '...'
+                            'Loading...'
                         )}
                     </p>
                     <p><strong>Completed:</strong> {order.completedAt ? new Date(order.completedAt).toLocaleString('en-US') : 'No'}</p>
@@ -81,23 +82,21 @@ export const OrderDetailPage = () => {
                 <h2>Add ticket</h2>
                 <form onSubmit={handleAddTicket} style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
                     <div className="form-group" style={{ flex: 1, margin: 0 }}>
-                        <label>Seat ID</label>
-                        <input
-                            className="form-control"
+                        <label>Seat</label>
+                        <SeatSelect
                             value={ticketForm.seatId}
-                            onChange={e => setTicketForm({ ...ticketForm, seatId: e.target.value })}
+                            onChange={id => setTicketForm({ ...ticketForm, seatId: id })}
+                            placeholder="Select seat"
                             required
-                            placeholder="Seat UUID"
                         />
                     </div>
                     <div className="form-group" style={{ flex: 1, margin: 0 }}>
-                        <label>Event ID</label>
-                        <input
-                            className="form-control"
+                        <label>Event</label>
+                        <EventSelect
                             value={ticketForm.eventId}
-                            onChange={e => setTicketForm({ ...ticketForm, eventId: e.target.value })}
+                            onChange={id => setTicketForm({ ...ticketForm, eventId: id })}
+                            placeholder="Select event"
                             required
-                            placeholder="Event UUID"
                         />
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ alignSelf: 'end' }}>
@@ -111,14 +110,18 @@ export const OrderDetailPage = () => {
                 <table>
                     <thead>
                     <tr>
-                        <th>Ticket ID</th>
+                        <th>Ticket</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {order.ticketIds.map(ticketId => (
+                    {order.ticketIds.map((ticketId, index) => (
                         <tr key={ticketId}>
-                            <td>{ticketId}</td>
+                            <td>
+                                <Link to={`/tickets/${ticketId}`} style={{ color: '#007bff', textDecoration: 'none' }}>
+                                    Ticket #{index + 1}
+                                </Link>
+                            </td>
                             <td>
                                 <button
                                     onClick={async () => {

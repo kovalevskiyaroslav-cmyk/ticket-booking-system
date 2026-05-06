@@ -56,7 +56,7 @@ export const PaymentDetailPage = () => {
             </Link>
 
             <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                <h1>Payment {payment.id}</h1>
+                <h1>Payment</h1>
 
                 {errorMsg && <ErrorMessage message={errorMsg} />}
 

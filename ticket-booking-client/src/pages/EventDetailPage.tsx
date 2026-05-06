@@ -2,18 +2,33 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
 import { useTickets } from '../hooks/useTickets';
+import { useVenues } from '../hooks/useVenues';
+import { useSeats } from '../hooks/useSeats';
 import { EventUpdate } from '../types/event';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { UUID } from '../types/common';
 
+const SeatCell = ({ seatId }: { seatId: UUID }) => {
+    const { useSeatById } = useSeats();
+    const { data: seat, isLoading } = useSeatById(seatId);
+    if (isLoading) return <span>Loading...</span>;
+    return (
+        <Link to={`/seats/${seatId}`} style={{ color: '#007bff', textDecoration: 'none' }}>
+            {seat ? `Seat №${seat.number}` : 'Seat'}
+        </Link>
+    );
+};
+
 export const EventDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const { useEventById, useUpdateEvent } = useEvents();
     const { useTicketsByEventId } = useTickets();
+    const { useVenueById } = useVenues();
 
     const { data: event, isLoading, error, refetch } = useEventById(id as UUID);
     const { data: tickets } = useTicketsByEventId(id as UUID);
+    const { data: venue } = useVenueById(event?.venueId || null);
     const updateEvent = useUpdateEvent();
 
     const [isEditing, setIsEditing] = useState(false);
@@ -148,10 +163,18 @@ export const EventDetailPage = () => {
                     </form>
                 ) : (
                     <div style={{ marginTop: '20px' }}>
-                        <p><strong>ID:</strong> {event.id}</p>
                         <p><strong>Description:</strong> {event.description || 'No description'}</p>
                         <p><strong>Date and time:</strong> {new Date(event.dateTime).toLocaleString('en-US')}</p>
-                        <p><strong>Venue:</strong> <Link to={`/venues/${event.venueId}`}>{event.venueId}</Link></p>
+                        <p>
+                            <strong>Venue:</strong>{' '}
+                            {venue ? (
+                                <Link to={`/venues/${event.venueId}`} style={{ color: '#007bff', textDecoration: 'none' }}>
+                                    {venue.name}
+                                </Link>
+                            ) : (
+                                'Loading...'
+                            )}
+                        </p>
                     </div>
                 )}
             </div>
@@ -161,7 +184,6 @@ export const EventDetailPage = () => {
                 <table>
                     <thead>
                     <tr>
-                        <th>Ticket ID</th>
                         <th>Price</th>
                         <th>Seat</th>
                     </tr>
@@ -169,9 +191,8 @@ export const EventDetailPage = () => {
                     <tbody>
                     {tickets.map(ticket => (
                         <tr key={ticket.id}>
-                            <td>{ticket.id}</td>
                             <td>{ticket.price} ₽</td>
-                            <td>{ticket.seatId}</td>
+                            <td><SeatCell seatId={ticket.seatId} /></td>
                         </tr>
                     ))}
                     </tbody>

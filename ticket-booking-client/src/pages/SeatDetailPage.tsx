@@ -129,7 +129,6 @@ export const SeatDetailPage = () => {
                     </form>
                 ) : (
                     <div style={{ marginTop: '20px' }}>
-                        <p><strong>ID:</strong> {seat.id}</p>
                         <p><strong>Section:</strong> {seat.section}</p>
                         <p><strong>Price:</strong> {seat.price} ₽</p>
                         <p><strong>Venue:</strong>{' '}
@@ -138,9 +137,7 @@ export const SeatDetailPage = () => {
                                     {venue.name}
                                 </Link>
                             ) : (
-                                <Link to={`/venues/${seat.venueId}`} style={{ color: '#007bff' }}>
-                                    {seat.venueId}
-                                </Link>
+                                'Loading...'
                             )}
                         </p>
                     </div>

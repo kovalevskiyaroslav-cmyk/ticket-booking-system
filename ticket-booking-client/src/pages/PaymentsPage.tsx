@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { usePayments } from '../hooks/usePayments';
-import { PaymentStatus, UUID } from '../types/common';
-import { PaymentUpdate } from '../types/payment';
+import { PaymentStatus } from '../types/common';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Link } from 'react-router-dom';
 
 export const PaymentsPage = () => {
-    const { useAllPayments, usePaymentsByStatus, usePaymentsByAmountRange, useUpdatePayment } = usePayments();
+    const { useAllPayments, usePaymentsByStatus, usePaymentsByAmountRange } = usePayments();
     const { data: payments, isLoading, error, refetch } = useAllPayments();
-    const updatePayment = useUpdatePayment();
 
     const [filterType, setFilterType] = useState<'all' | 'status' | 'amount'>('all');
     const [statusFilter, setStatusFilter] = useState<PaymentStatus>(PaymentStatus.PENDING);
@@ -34,24 +32,6 @@ export const PaymentsPage = () => {
     const handleSearch = () => {
         if (filterType === 'status') searchByStatus();
         if (filterType === 'amount' && minAmount && maxAmount) searchByAmount();
-    };
-
-    const handleUpdateStatus = async (paymentId: UUID, newStatus: PaymentStatus) => {
-        try {
-            await updatePayment.mutateAsync({
-                id: paymentId,
-                data: { status: newStatus } as PaymentUpdate,
-            });
-        } catch (err: any) {
-            const detail = err.response?.data?.detail || '';
-            if (detail.includes('Invalid') || detail.includes('transition') || detail.includes('cannot')) {
-                alert(`Cannot change payment status from current to ${newStatus}`);
-            } else if (detail.includes('not found')) {
-                alert('Payment not found');
-            } else {
-                alert(`Error: ${detail}`);
-            }
-        }
     };
 
     if (isLoading) return <LoadingSpinner />;
@@ -124,7 +104,6 @@ export const PaymentsPage = () => {
             <table>
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -133,11 +112,6 @@ export const PaymentsPage = () => {
                 <tbody>
                 {displayPayments?.map(payment => (
                     <tr key={payment.id}>
-                        <td>
-                            <Link to={`/payments/${payment.id}`} style={{ color: '#007bff', textDecoration: 'none' }}>
-                                {payment.id.substring(0, 8)}...
-                            </Link>
-                        </td>
                         <td>{payment.amount} ₽</td>
                         <td>
                 <span style={{
@@ -160,16 +134,13 @@ export const PaymentsPage = () => {
                 </span>
                         </td>
                         <td>
-                            <select
-                                value={payment.status}
-                                onChange={e => handleUpdateStatus(payment.id, e.target.value as PaymentStatus)}
-                                className="form-control"
-                                style={{ padding: '4px', display: 'inline-block', width: 'auto' }}
+                            <Link
+                                to={`/payments/${payment.id}`}
+                                className="btn btn-primary"
+                                style={{ padding: '4px 8px', fontSize: '13px', textDecoration: 'none', display: 'inline-block' }}
                             >
-                                {Object.values(PaymentStatus).map(status => (
-                                    <option key={status} value={status}>{status}</option>
-                                ))}
-                            </select>
+                                View
+                            </Link>
                         </td>
                     </tr>
                 ))}
