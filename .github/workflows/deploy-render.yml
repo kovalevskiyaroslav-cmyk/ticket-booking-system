@@ -47,7 +47,7 @@ jobs:
             https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys
 
       - name: Wait for deployment
-        run: sleep 600
+        run: sleep 340
 
       - name: Healthcheck
         run: |
@@ -58,7 +58,7 @@ jobs:
           RETRY_COUNT=0
           
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            if curl -f https://${{ secrets.RENDER_SERVICE_NAME }}.onrender.com/actuator/health; then
+            if curl -f https://${{ secrets.RENDER_SERVICE_NAME }}-jc92.onrender.com/actuator/health; then
               echo "Healthcheck passed!"
               exit 0
             fi
