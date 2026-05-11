@@ -5,6 +5,7 @@ plugins {
     id "org.sonarqube" version "7.1.0.6387"
     id 'checkstyle'
     id 'jacoco'
+    id 'com.github.node-gradle.node' version '7.0.1'
 }
 
 group = 'com.yaroslav'
@@ -74,3 +75,34 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+node {
+    version = '18.17.0'
+    npmVersion = '10.2.3'
+    download = true
+    workDir = file("${project.buildDir}/node")
+    nodeModulesDir = file("${project.projectDir}/ticket-booking-client")
+}
+
+tasks.register('npmInstall', NpmTask) {
+    description = 'Install Node.js packages'
+    workingDir = file("${project.projectDir}/ticket-booking-client")
+    args = ['install']
+}
+
+tasks.register('buildFrontend', NpmTask) {
+    description = 'Build frontend application'
+    workingDir = file("${project.projectDir}/ticket-booking-client")
+    args = ['run', 'build']
+    environment = ['VITE_API_URL': '']
+}
+
+tasks.register('copyFrontendBuild', Copy) {
+    description = 'Copy frontend build to Spring Boot static directory'
+    from file("${project.projectDir}/ticket-booking-client/dist")
+    into file("${project.buildDir}/resources/main/static")
+}
+
+buildFrontend.dependsOn npmInstall
+copyFrontendBuild.dependsOn buildFrontend
+processResources.dependsOn copyFrontendBuild
