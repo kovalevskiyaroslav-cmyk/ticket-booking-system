@@ -81,7 +81,7 @@ node {
     npmVersion = '10.2.3'
     download = true
     workDir = file("${project.buildDir}/node")
-    nodeModulesDir = file("${project.projectDir}/ticket-booking-client")
+    nodeProjectDir = file("${project.projectDir}/ticket-booking-client")
 }
 
 tasks.register('npmInstall', NpmTask) {
@@ -94,7 +94,7 @@ tasks.register('buildFrontend', NpmTask) {
     description = 'Build frontend application'
     workingDir = file("${project.projectDir}/ticket-booking-client")
     args = ['run', 'build']
-    environment = ['VITE_API_URL': '']
+    environment = ['VITE_API_URL': 'https://ticket-booking-system-jc92.onrender.com']
 }
 
 tasks.register('copyFrontendBuild', Copy) {
