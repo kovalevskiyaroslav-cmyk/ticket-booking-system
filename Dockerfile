@@ -1,4 +1,5 @@
 FROM eclipse-temurin:21-jdk-alpine AS builder
+RUN apk add --no-cache nodejs npm
 WORKDIR /app
 COPY . .
 RUN chmod +x gradlew
