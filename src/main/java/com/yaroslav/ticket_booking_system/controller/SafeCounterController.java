@@ -3,6 +3,7 @@ package com.yaroslav.ticket_booking_system.controller;
 import com.yaroslav.ticket_booking_system.service.SafeCounterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/safe-counter")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"https://ticket-booking-client-phhj.onrender.com", "http://localhost:3000", "http://localhost:5173"})
 public class SafeCounterController {
 
     private final SafeCounterService counterService;

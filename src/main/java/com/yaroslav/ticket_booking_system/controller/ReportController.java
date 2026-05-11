@@ -5,6 +5,7 @@ import com.yaroslav.ticket_booking_system.dto.SalesReportRequestDto;
 import com.yaroslav.ticket_booking_system.service.SalesReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/reports")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"https://ticket-booking-client-phhj.onrender.com", "http://localhost:3000", "http://localhost:5173"})
 public class ReportController {
 
     private final SalesReportService reportService;
