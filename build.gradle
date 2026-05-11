@@ -73,7 +73,7 @@ dependencies {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 node {
@@ -84,7 +84,7 @@ node {
     nodeProjectDir = file("${project.projectDir}/ticket-booking-client")
 }
 
-tasks.register('npmInstall', NpmTask) {
+tasks.register('installFrontendDeps', NpmTask) {
     description = 'Install Node.js packages'
     workingDir = file("${project.projectDir}/ticket-booking-client")
     args = ['install']
@@ -94,15 +94,15 @@ tasks.register('buildFrontend', NpmTask) {
     description = 'Build frontend application'
     workingDir = file("${project.projectDir}/ticket-booking-client")
     args = ['run', 'build']
-    environment = ['VITE_API_URL': 'https://ticket-booking-system-jc92.onrender.com']
+    environment = ['VITE_API_URL': '']
+    dependsOn installFrontendDeps
 }
 
 tasks.register('copyFrontendBuild', Copy) {
     description = 'Copy frontend build to Spring Boot static directory'
     from file("${project.projectDir}/ticket-booking-client/dist")
     into file("${project.buildDir}/resources/main/static")
+    dependsOn buildFrontend
 }
 
-buildFrontend.dependsOn npmInstall
-copyFrontendBuild.dependsOn buildFrontend
 processResources.dependsOn copyFrontendBuild
